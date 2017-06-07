@@ -22,6 +22,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.firebase.database.DatabaseReference;
 
 import java.io.IOException;
@@ -37,7 +41,7 @@ import bank.axis.nearbyme.UserDetails.UsersModel;
 public class EmployeeDetails extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    TextView et_name,et_email,et_number;
+    TextView et_name,et_email,et_number,tv_location_name,tv_location_address,tv_location_attributes;
     ImageView profile_image;
     Button bt_upload,bt_map;
 
@@ -48,12 +52,18 @@ public class EmployeeDetails extends AppCompatActivity
     private static UsersModel addUserData;
     private String userId;
 
+    //Map
+    int PLACE_PICKER_REQUEST = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_employee_details);
 
         bt_map = (Button) findViewById(R.id.bt_map);
+        tv_location_name = (TextView) findViewById(R.id.tv_location_name);
+        tv_location_address = (TextView) findViewById(R.id.tv_location_address);
+        tv_location_attributes = (TextView) findViewById(R.id.tv_location_attribution);
         //Database
         addUserData = new UsersModel();
         mDatabase = DatabaseInstance.getFirebaseInstance().getReference();
@@ -74,8 +84,19 @@ public class EmployeeDetails extends AppCompatActivity
         bt_map.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(EmployeeDetails.this,MapsActivity.class);
-                startActivity(i);
+                /*Intent i = new Intent(EmployeeDetails.this,MapsActivity.class);
+                startActivity(i);*/
+                try {
+
+                    PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                    Intent i = builder.build(EmployeeDetails.this);
+                    startActivityForResult(i, PLACE_PICKER_REQUEST);
+
+                } catch (GooglePlayServicesRepairableException e) {
+                    e.printStackTrace();
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -191,6 +212,29 @@ public class EmployeeDetails extends AppCompatActivity
         new ImageLoadTask(photourl,profile_image);
 
     }*/
+
+    //Code for getting Selected Pointer from Place Picker
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PLACE_PICKER_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlacePicker.getPlace(data, this);
+                final CharSequence name = place.getName();
+                final CharSequence address = place.getAddress();
+                String attributions = (String) place.getAttributions();
+                if(attributions == null){
+                    attributions = "";
+                }
+
+                tv_location_name.setText(name);
+                tv_location_address.setText(address);
+                tv_location_attributes.setText(attributions);
+
+                /*String toastMsg = String.format("Place: %s", place.getName());
+                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();*/
+            }
+        }
+    }
+
     public static Bitmap getBitmapFromURL(String src) {
         try {
             Log.e("src",src);

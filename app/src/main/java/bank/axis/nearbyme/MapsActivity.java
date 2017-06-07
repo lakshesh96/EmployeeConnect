@@ -7,8 +7,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,7 +35,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 //import java.lang.*;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = MapsActivity.class.getSimpleName();
     private GoogleMap mMap;
@@ -59,6 +60,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String KEY_LOCATION = "location";
     private static final String default_info_snippet = "waiting";
     private static final String default_info_title = new String("still waiting");
+    private static final String[] test = {"One","Two"};
 
     // Used for selecting the current place.
     private final int mMaxEntries = 5;
@@ -71,6 +73,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
         if (savedInstanceState != null) {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
@@ -321,10 +324,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 };
 
         // Display the dialog.
-        /*AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle(R.string.pick_place)
+        new AlertDialog.Builder(this)
+                .setTitle("Place Picker")
                 .setItems(mLikelyPlaceNames, listener)
-                .show();*/
+                //.setItems(test, listener)
+                .show();
     }
 
 

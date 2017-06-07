@@ -12,10 +12,11 @@
         android:id="@+id/bt_upload_details"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="103dp"
+        android:text="Upload Details"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="106dp"
-        android:text="Upload Details" />
+        android:layout_alignStart="@+id/bt_map"
+        android:layout_alignEnd="@+id/bt_map" />
 
     <EditText
         android:id="@+id/et_number"
@@ -24,16 +25,46 @@
         android:ems="10"
         android:hint="Enter Contact Number"
         android:inputType="textPersonName"
-        android:layout_above="@+id/bt_upload_details"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="133dp" />
+        android:layout_below="@+id/bt_map"
+        android:layout_marginTop="51dp"
+        android:layout_alignEnd="@+id/tv_location_name"
+        android:layout_alignStart="@+id/tv_location_name" />
 
     <Button
         android:id="@+id/bt_map"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/et_number"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="57dp"
-        android:text="Show Map" />
+        android:layout_marginTop="68dp"
+        android:text="Add Location from Map" />
+
+    <TextView
+        android:id="@+id/tv_location_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Location Name"
+        android:layout_alignTop="@+id/et_number"
+        android:layout_marginTop="72dp"
+        android:layout_alignEnd="@+id/tv_location_address"
+        android:layout_alignStart="@+id/tv_location_address" />
+
+    <TextView
+        android:id="@+id/tv_location_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:text="Location Address"
+        android:layout_alignEnd="@+id/tv_location_attribution"
+        android:layout_alignStart="@+id/tv_location_attribution" />
+
+    <TextView
+        android:id="@+id/tv_location_attribution"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/bt_upload_details"
+        android:layout_marginBottom="41dp"
+        android:text="Location Attributions"
+        android:layout_alignStart="@+id/bt_upload_details"
+        android:layout_alignEnd="@+id/bt_upload_details" />
 </RelativeLayout>
