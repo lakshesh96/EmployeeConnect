@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -18,6 +18,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -40,15 +41,15 @@ public class SignInActivity extends AppCompatActivity implements
 
     private FirebaseAuth mAuth;
 
-    EditText et_status;
     Button bt_logout,bt_disconnect;
+    TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
-        et_status = (EditText) findViewById(R.id.et_status);
+        textView = (TextView) findViewById(R.id.textView);
         bt_logout = (Button) findViewById(R.id.bt_logout);
         bt_disconnect = (Button) findViewById(R.id.bt_disconnect);
 
@@ -58,7 +59,51 @@ public class SignInActivity extends AppCompatActivity implements
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+                if (opr.isDone()) {
+                    // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
+                    // and the GoogleSignInResult will be available instantly.
+                    Log.d(TAG, "Got cached sign-in");
+                    GoogleSignInResult result = opr.get();
+                    handleSignInResult(result);
+                    //GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent();
+//                    GoogleSignInAccount acct = result.getSignInAccount();
+//                    textView.setText(acct.getDisplayName());
+//                    Intent i = new Intent(SignInActivity.this,EmployeeDetails.class);
+//                    i.putExtra("key1",acct.getDisplayName());
+//                    //Log.d(TAG, acct.getDisplayName());
+//                    i.putExtra("key2",acct.getEmail());
+//                    //Log.d(TAG, acct.getEmail());
+//                    i.putExtra("key3",acct.getPhotoUrl());
+//                    startActivity(i);
+
+                } else {
+                    // If the user has not previously signed in on this device or the sign-in has expired,
+                    // this asynchronous branch will attempt to sign in the user silently.  Cross-device
+                    // single sign-on will occur in this branch.
+                    showProgressDialog();
+                    opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                        @Override
+                        public void onResult(GoogleSignInResult googleSignInResult) {
+                            hideProgressDialog();
+                            //handleSignInResult(googleSignInResult);
+                        }
+                    });
+                }
                 signIn();
+            }
+        });
+
+        bt_logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signOut();
+            }
+        });
+        bt_disconnect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                revokeAccess();
             }
         });
 
@@ -77,6 +122,8 @@ public class SignInActivity extends AppCompatActivity implements
     @Override
     public void onStart() {
         super.onStart();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
     }
 
     @Override
@@ -124,11 +171,17 @@ public class SignInActivity extends AppCompatActivity implements
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            et_status.setText(acct.getDisplayName());
+            firebaseAuthWithGoogle(acct);
+            textView.setText(acct.getDisplayName());
+            Intent i = new Intent(SignInActivity.this,EmployeeDetails.class);
+            i.putExtra("key1",acct.getDisplayName());
+            i.putExtra("key2",acct.getEmail());
+            i.putExtra("key3",acct.getPhotoUrl().toString());
+            startActivity(i);
             //updateUI(true);
         } else {
             // Signed out, show unauthenticated UI.
-            //updateUI(false);
+            Log.d(TAG,"SignIn Failed");
         }
     }
     private void signIn() {

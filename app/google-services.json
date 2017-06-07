@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "355485271926",
+    "firebase_url": "https://nearbyme-bde24.firebaseio.com",
+    "project_id": "nearbyme-bde24",
+    "storage_bucket": "nearbyme-bde24.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:355485271926:android:2ca7b7f4cecc514b",
+        "android_client_info": {
+          "package_name": "bank.axis.nearbyme"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "355485271926-42e7g1n8vavf5hin358l3aon82gs2rjb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "bank.axis.nearbyme",
+            "certificate_hash": "c1e0d4b9b58e9f86e794f17d4e36acaf41970b97"
+          }
+        },
+        {
+          "client_id": "355485271926-7urd9ctu0h1r6k6tqbtt3han3s6ig0fg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDD26kDzeIvcNEtLG73IuX8rTg7eFXjqzk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "355485271926-7urd9ctu0h1r6k6tqbtt3han3s6ig0fg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

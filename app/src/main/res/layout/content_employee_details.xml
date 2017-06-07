@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,4 +8,32 @@
     tools:context="bank.axis.nearbyme.EmployeeDetails"
     tools:showIn="@layout/app_bar_employee_details">
 
-</android.support.constraint.ConstraintLayout>
+    <Button
+        android:id="@+id/bt_upload_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="106dp"
+        android:text="Upload Details" />
+
+    <EditText
+        android:id="@+id/et_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Enter Contact Number"
+        android:inputType="textPersonName"
+        android:layout_above="@+id/bt_upload_details"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="133dp" />
+
+    <Button
+        android:id="@+id/bt_map"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/et_number"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="57dp"
+        android:text="Show Map" />
+</RelativeLayout>

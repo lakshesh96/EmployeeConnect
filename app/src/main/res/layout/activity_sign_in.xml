@@ -28,19 +28,17 @@
         android:id="@+id/bt_disconnect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="99dp"
+        android:layout_marginBottom="79dp"
         android:text="Disconnect"
-        android:layout_above="@+id/et_status"
+        android:layout_alignBottom="@+id/textView"
         android:layout_centerHorizontal="true" />
 
-    <EditText
-        android:id="@+id/et_status"
+    <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Status"
-        android:inputType="textPersonName"
-        android:layout_marginBottom="142dp"
+        android:text="TextView"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="95dp" />
 </RelativeLayout>
