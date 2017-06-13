@@ -39,7 +39,7 @@
         app:elevation="5dp"
         app:fabSize="mini"
         app:layout_anchor="@+id/include"
-        app:layout_anchorGravity="bottom|right"
+        app:layout_anchorGravity="bottom|left"
         app:srcCompat="@drawable/nearme" />
 
 </android.support.design.widget.CoordinatorLayout>

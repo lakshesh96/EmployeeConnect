@@ -2,6 +2,8 @@ package bank.axis.nearbyme;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -42,11 +44,15 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 
+import java.util.List;
 import java.util.Locale;
 
+import bank.axis.nearbyme.Database.Cluster;
 import bank.axis.nearbyme.Database.DatabaseInstance;
+import bank.axis.nearbyme.Database.UserInfo;
 import bank.axis.nearbyme.UserDetails.UsersModel;
 //import com.androidquery.AQuery;
 
@@ -58,6 +64,7 @@ public class EmployeeDetails extends AppCompatActivity
     ImageView profile_image;
     Button bt_upload,bt_map;
 
+
     //Database
     private final String TAG = EmployeeDetails.class.getSimpleName();
     private DatabaseReference mDatabase;
@@ -65,6 +72,16 @@ public class EmployeeDetails extends AppCompatActivity
     private static UsersModel addUserData;
     private String userId;
     Bundle args = new Bundle();
+    private String currentuser;
+    String name,email;
+    //LatLng coordinates;
+    //CharSequence address;
+    private String uid;
+    Geocoder geocoder;
+    List<Address> addresses;
+    //String geo_address,geo_state,geo_pincode;
+    UserInfo userinfo;
+    UserInfo user;
 
     //Map
     int PLACE_PICKER_REQUEST = 1;
@@ -88,6 +105,7 @@ public class EmployeeDetails extends AppCompatActivity
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
     private Location mLastKnownLocation;
+    private LatLng mLastKnownLocationCoordinates;
 
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
@@ -122,6 +140,7 @@ public class EmployeeDetails extends AppCompatActivity
         tv_location_name = (TextView) findViewById(R.id.tv_location_name);
         tv_location_address = (TextView) findViewById(R.id.tv_location_address);
         tv_location_attributes = (TextView) findViewById(R.id.tv_location_attribution);*/
+        userinfo = new UserInfo();
         //Database
         addUserData = new UsersModel();
         mDatabase = DatabaseInstance.getFirebaseInstance().getReference();
@@ -191,6 +210,7 @@ public class EmployeeDetails extends AppCompatActivity
                 } catch (GooglePlayServicesNotAvailableException e) {
                     e.printStackTrace();
                 }
+
             }
         });
 
@@ -211,9 +231,10 @@ public class EmployeeDetails extends AppCompatActivity
         profile_image = (ImageView) header_layout.findViewById(R.id.imageView);
 
         Bundle extras = getIntent().getExtras();
-        String name = (String) extras.get("key1");
-        String email = (String) extras.get("key2");
+        name = (String) extras.get("key1");
+        email = (String) extras.get("key2");
         String photourl = (String) extras.get("key3");
+        uid = (String) extras.get("uid");
         //URI photourl2 =  dt.getStringExtra("key3");
         et_name.setText(name);
         et_email.setText(email);
@@ -327,8 +348,10 @@ public class EmployeeDetails extends AppCompatActivity
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(data, this);
                 final CharSequence name = place.getName();
-                final CharSequence address = place.getAddress();
-                final LatLng coordinates = place.getLatLng();
+                //address = place.getAddress();
+                userinfo.setAddress(place.getAddress().toString());
+                //coordinates = place.getLatLng();
+                userinfo.setCoordinates(place.getLatLng());
                 final Locale pin = place.getLocale();
                 String attributions = (String) place.getAttributions();
                 if(attributions == null){
@@ -338,8 +361,8 @@ public class EmployeeDetails extends AppCompatActivity
                 tv_location_address.setText(address);
                 tv_location_attributes.setText(attributions);*/
 
-                args.putParcelable("coordinates",coordinates);
-                mReceivedLocation = coordinates;
+                args.putParcelable("coordinates",userinfo.getCoordinates());
+                mReceivedLocation = userinfo.getCoordinates();
                 mMap.addMarker(new MarkerOptions()
                         .title(getString(R.string.title_activity_maps))
                         .position(mReceivedLocation)
@@ -366,8 +389,8 @@ public class EmployeeDetails extends AppCompatActivity
     public Bundle sendData(){
         return args;
     }
-    //Databse
 
+    //Database
     /*FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference mDatabase = database.getReference("message");*/
     //myRef.setValue("Hello, World!");
@@ -413,6 +436,37 @@ public class EmployeeDetails extends AppCompatActivity
     public void onInfoWindowClick(Marker marker) {
         Toast.makeText(this, "Info window clicked",
                 Toast.LENGTH_SHORT).show();
+        String temp_address;
+        LatLng temp_coordinates;
+            temp_address = userinfo.getAddress();
+            temp_coordinates = userinfo.getCoordinates();
+
+        geocoder = new Geocoder(this,Locale.getDefault());
+        try {
+            addresses = geocoder.getFromLocation(temp_coordinates.latitude,temp_coordinates.longitude,1);
+            userinfo.setAddress(addresses.get(0).getAddressLine(0));
+            //geo_state = addresses.get(0).getAdminArea();
+            userinfo.setPincode(addresses.get(0).getPostalCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        user = new UserInfo(name,"563225635",email,temp_address,temp_coordinates);
+        mDatabase.child("Users").child(uid).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(EmployeeDetails.this, "User Added Successfully", Toast.LENGTH_SHORT).show();
+            }
+        });
+        Cluster cluster = new Cluster(uid,temp_coordinates);
+        mDatabase.child("Cluster").child(userinfo.getPincode()).child(uid).setValue(cluster).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(EmployeeDetails.this, "Cluster added Successfully", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
     }
 
     @Override
@@ -493,14 +547,14 @@ public class EmployeeDetails extends AppCompatActivity
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
         }
-
-        LatLng temp = new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
+        LatLng cord = new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
+        userinfo.setCoordinates(cord);
         mMap.addMarker(new MarkerOptions()
                 .title(getString(R.string.title_activity_maps))
-                .position(temp)
+                .position(cord)
                 .snippet("Selected Location"));
         refreshMap(mMap);
-        markStartingLocationOnMap(mMap, temp);
+        markStartingLocationOnMap(mMap, cord);
 
     }
 
@@ -553,6 +607,7 @@ public class EmployeeDetails extends AppCompatActivity
     }
 
     private void markStartingLocationOnMap(GoogleMap mapObject, LatLng location){
+
         mapObject.addMarker(new MarkerOptions().position(location).title("Selected location"));
         mapObject.moveCamera(CameraUpdateFactory.newLatLng(location));
     }

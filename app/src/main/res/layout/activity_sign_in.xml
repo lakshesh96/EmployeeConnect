@@ -36,7 +36,7 @@
         android:id="@+id/imageView2"
         android:layout_width="250dp"
         android:layout_height="250dp"
-        app:srcCompat="@drawable/nearme"
+        app:srcCompat="@mipmap/ic_launcher"
         android:layout_above="@+id/sign_in_button"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="36dp" />
