@@ -8,7 +8,16 @@
     tools:context="bank.axis.nearbyme.EmployeeDetails"
     tools:showIn="@layout/app_bar_employee_details">
 
-    <Button
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="bank.axis.nearbyme.MapsActivity" />
+
+<!--    <Button
         android:id="@+id/bt_upload_details"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -66,5 +75,5 @@
         android:layout_marginBottom="41dp"
         android:text="Location Attributions"
         android:layout_alignStart="@+id/bt_upload_details"
-        android:layout_alignEnd="@+id/bt_upload_details" />
+        android:layout_alignEnd="@+id/bt_upload_details" />-->
 </RelativeLayout>

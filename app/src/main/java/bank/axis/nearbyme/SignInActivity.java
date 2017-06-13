@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -36,22 +35,23 @@ public class SignInActivity extends AppCompatActivity implements
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
 
-    private GoogleApiClient mGoogleApiClient;
+    public GoogleApiClient mGoogleApiClient;
     private ProgressDialog mProgressDialog;
 
     private FirebaseAuth mAuth;
 
     Button bt_logout,bt_disconnect;
-    TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
-        textView = (TextView) findViewById(R.id.textView);
         bt_logout = (Button) findViewById(R.id.bt_logout);
         bt_disconnect = (Button) findViewById(R.id.bt_disconnect);
+        bt_logout.setVisibility(View.INVISIBLE);
+        bt_disconnect.setVisibility(View.INVISIBLE);
+
 
         SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
@@ -172,11 +172,12 @@ public class SignInActivity extends AppCompatActivity implements
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
             firebaseAuthWithGoogle(acct);
-            textView.setText(acct.getDisplayName());
+            Toast.makeText(this, "Welcome "+acct.getDisplayName(), Toast.LENGTH_LONG).show();
             Intent i = new Intent(SignInActivity.this,EmployeeDetails.class);
             i.putExtra("key1",acct.getDisplayName());
             i.putExtra("key2",acct.getEmail());
             i.putExtra("key3",acct.getPhotoUrl().toString());
+            //i.putExtra("key4",mGoogleApiClient.toString());
             startActivity(i);
             //updateUI(true);
         } else {
@@ -189,20 +190,22 @@ public class SignInActivity extends AppCompatActivity implements
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
-    private void signOut() {
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+    public void signOut(/*GoogleApiClient temp*/) {
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient/*temp*/).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
+                        Toast.makeText(SignInActivity.this, "Successfully Signed Out", Toast.LENGTH_SHORT).show();
                         //updateUI(false);
                     }
                 });
     }
-    private void revokeAccess() {
+    public void revokeAccess() {
         Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
+                        Toast.makeText(SignInActivity.this, "Successfully Disconnected", Toast.LENGTH_SHORT).show();
                         //updateUI(false);
                     }
                 });

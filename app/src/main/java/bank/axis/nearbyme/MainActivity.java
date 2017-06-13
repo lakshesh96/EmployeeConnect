@@ -21,9 +21,9 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 Intent i = new Intent(MainActivity.this,SignInActivity.class);
                 startActivity(i);
+                finish();
             }
         },SPLASH_TIME_OUT);
-
         /*bt_proceed = (Button) findViewById(R.id.bt_proceed);
         bt_proceed.setOnClickListener(new View.OnClickListener() {
             @Override
