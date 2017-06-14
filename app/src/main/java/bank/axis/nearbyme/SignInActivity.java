@@ -3,7 +3,9 @@ package bank.axis.nearbyme;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -42,6 +44,8 @@ public class SignInActivity extends AppCompatActivity implements
     private FirebaseUser user;
 
     Button bt_logout,bt_disconnect;
+    int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    String uid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +56,30 @@ public class SignInActivity extends AppCompatActivity implements
         bt_disconnect = (Button) findViewById(R.id.bt_disconnect);
         bt_logout.setVisibility(View.INVISIBLE);
         bt_disconnect.setVisibility(View.INVISIBLE);
+
+        try {
+            int off = Settings.Secure.getInt(getContentResolver(), Settings.Secure.LOCATION_MODE);
+            if(off==0){
+                Intent gpsOptionsIntent = new Intent (android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                Toast.makeText(SignInActivity.this, "Please switch on GPS and then press Back", Toast.LENGTH_LONG).show();
+                startActivity(gpsOptionsIntent);
+            }
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
+        //GPS Permission
+        /*
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+
+
+        } else {
+
+        }*/
+        ActivityCompat.requestPermissions(this,
+                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
 
 
         SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
@@ -179,8 +207,8 @@ public class SignInActivity extends AppCompatActivity implements
             i.putExtra("key2",acct.getEmail());
             i.putExtra("key3",acct.getPhotoUrl().toString());
             mAuth = FirebaseAuth.getInstance();
-            String uid = mAuth.getCurrentUser().getUid();
-            i.putExtra("uid",uid);
+            //uid = mAuth.getCurrentUser().getUid();
+            //i.putExtra("uid",uid);
             //i.putExtra("key4",mGoogleApiClient.toString());
             startActivity(i);
             //updateUI(true);

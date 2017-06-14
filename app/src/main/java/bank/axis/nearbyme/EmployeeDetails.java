@@ -45,6 +45,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.List;
@@ -63,7 +64,7 @@ public class EmployeeDetails extends AppCompatActivity
     TextView et_name,et_email,et_number,tv_location_name,tv_location_address,tv_location_attributes;
     ImageView profile_image;
     Button bt_upload,bt_map;
-
+    FirebaseAuth mAuth;
 
     //Database
     private final String TAG = EmployeeDetails.class.getSimpleName();
@@ -234,7 +235,8 @@ public class EmployeeDetails extends AppCompatActivity
         name = (String) extras.get("key1");
         email = (String) extras.get("key2");
         String photourl = (String) extras.get("key3");
-        uid = (String) extras.get("uid");
+        //uid = mAuth.getCurrentUser().getUid();
+        //uid = (String) extras.get("uid");
         //URI photourl2 =  dt.getStringExtra("key3");
         et_name.setText(name);
         et_email.setText(email);
@@ -451,6 +453,12 @@ public class EmployeeDetails extends AppCompatActivity
             e.printStackTrace();
         }
 
+        if(mAuth.getInstance().getCurrentUser().getUid() == null){
+            /*Intent i = new Intent(EmployeeDetails.this,SignInActivity.class);
+            Toast.makeText(this, "Please Login again!", Toast.LENGTH_SHORT).show();
+            startActivity(i);*/
+        }else
+            uid = mAuth.getInstance().getCurrentUser().getUid();
         user = new UserInfo(name,"563225635",email,temp_address,temp_coordinates);
         mDatabase.child("Users").child(uid).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
