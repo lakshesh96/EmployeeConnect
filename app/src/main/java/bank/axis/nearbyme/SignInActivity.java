@@ -30,6 +30,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import bank.axis.nearbyme.Database.UserInfo;
+
 public class SignInActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener,
         View.OnClickListener {
@@ -46,6 +48,7 @@ public class SignInActivity extends AppCompatActivity implements
     Button bt_logout,bt_disconnect;
     int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     String uid;
+    UserInfo userInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +59,7 @@ public class SignInActivity extends AppCompatActivity implements
         bt_disconnect = (Button) findViewById(R.id.bt_disconnect);
         bt_logout.setVisibility(View.INVISIBLE);
         bt_disconnect.setVisibility(View.INVISIBLE);
+        userInfo = new UserInfo();
 
         try {
             int off = Settings.Secure.getInt(getContentResolver(), Settings.Secure.LOCATION_MODE);
