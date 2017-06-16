@@ -132,8 +132,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
 
         //Bundle bundle = getIntent().getParcelableExtra("bundle");
         EmployeeDetails emp = (EmployeeDetails) getActivity();
-        Bundle bundle = emp.sendData();
-        mReceivedLocation = bundle.getParcelable("coordinates");
+        //Bundle bundle = emp.sendData();
+        //mReceivedLocation = bundle.getParcelable("coordinates");
         if (savedInstanceState != null) {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
@@ -343,8 +343,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         super.onActivityResult(requestCode, resultCode, data);
         //Bundle bundle = getIntent().getParcelableExtra("bundle");
         EmployeeDetails emp = (EmployeeDetails) getActivity();
-        Bundle bundle = emp.sendData();
-        mReceivedLocation = bundle.getParcelable("coordinates");
+        //Bundle bundle = emp.sendData();
+        //mReceivedLocation = bundle.getParcelable("coordinates");
         Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
         /*mMap.addMarker(new MarkerOptions()
                 .title(getString(R.string.title_activity_maps))

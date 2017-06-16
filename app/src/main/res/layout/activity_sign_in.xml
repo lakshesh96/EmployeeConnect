@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/common_google_signin_btn_text_dark_default"
     tools:context="bank.axis.nearbyme.SignInActivity">\
 
     <com.google.android.gms.common.SignInButton
@@ -18,27 +19,28 @@
         android:id="@+id/bt_logout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Logout"
         android:layout_above="@+id/bt_disconnect"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="22dp" />
+        android:layout_marginStart="22dp"
+        android:text="Logout" />
 
     <Button
         android:id="@+id/bt_disconnect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="69dp"
-        android:text="Disconnect"
         android:layout_alignParentBottom="true"
-        android:layout_alignStart="@+id/bt_logout" />
+        android:layout_alignStart="@+id/bt_logout"
+        android:layout_marginBottom="69dp"
+        android:text="Disconnect" />
 
     <ImageView
         android:id="@+id/imageView2"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        app:srcCompat="@drawable/nearme"
+        android:layout_width="400dp"
+        android:layout_height="400dp"
         android:layout_above="@+id/sign_in_button"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="36dp" />
+        android:layout_marginBottom="36dp"
+        android:background="@color/common_google_signin_btn_text_dark_default"
+        app:srcCompat="@drawable/logo_nearbyme" />
 
 </RelativeLayout>

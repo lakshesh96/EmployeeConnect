@@ -1,57 +1,40 @@
 package bank.axis.nearbyme;
 
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.List;
-import java.util.Locale;
 
-import bank.axis.nearbyme.Database.Cluster;
 import bank.axis.nearbyme.Database.DatabaseInstance;
 import bank.axis.nearbyme.Database.UserInfo;
 import bank.axis.nearbyme.UserDetails.UsersModel;
@@ -59,7 +42,7 @@ import bank.axis.nearbyme.UserDetails.UsersModel;
 
 
 public class EmployeeDetails extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,MapFragment.OnFragmentInteractionListener,OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener,GoogleMap.OnInfoWindowClickListener  {
+        implements NavigationView.OnNavigationItemSelectedListener,GeneralQueryFragment.OnFragmentInteractionListener,GoogleMapFragment.OnFragmentInteractionListener  {
 
     TextView et_name,et_email,et_number,tv_location_name,tv_location_address,tv_location_attributes;
     ImageView profile_image;
@@ -121,6 +104,9 @@ public class EmployeeDetails extends AppCompatActivity
     private String[] mLikelyPlaceAddresses = new String[mMaxEntries];
     private String[] mLikelyPlaceAttributions = new String[mMaxEntries];
     private LatLng[] mLikelyPlaceLatLngs = new LatLng[mMaxEntries];*/
+
+    private FragmentManager fragmentManager;
+    private SupportMapFragment mapFragment;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -250,21 +236,49 @@ public class EmployeeDetails extends AppCompatActivity
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
+        fragmentManager = getSupportFragmentManager();
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */,
-                        this /* OnConnectionFailedListener */)
+
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        GoogleMapFragment googleMapFragment = new GoogleMapFragment();
+        Bundle googleMapData = new Bundle();
+
+        if(mAuth.getInstance().getCurrentUser().getUid() == null){
+            /*Intent i = new Intent(EmployeeDetails.this,SignInActivity.class);
+            Toast.makeText(this, "Please Login again!", Toast.LENGTH_SHORT).show();
+            startActivity(i);*/
+        }else
+            uid = mAuth.getInstance().getCurrentUser().getUid();
+        googleMapData.putString("UID",uid);
+        fragmentTransaction.add(R.id.fragmentHolder,googleMapFragment);
+        fragmentTransaction.commit();
+
+/*        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this *//* FragmentActivity *//*,
+                        this *//* OnConnectionFailedListener *//*)
                 .addConnectionCallbacks(this)
                 .addApi(LocationServices.API)
                 .addApi(Places.GEO_DATA_API)
                 .addApi(Places.PLACE_DETECTION_API)
                 .build();
-        mGoogleApiClient.connect();
+        mGoogleApiClient.connect();*/
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+
+/*        mapFragment = SupportMapFragment.newInstance();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.map, mapFragment, "map");
+        fragmentTransaction.commit();
+        mapFragment.getMapAsync(this);*/
+
+/*        mapFragment = SupportMapFragment.newInstance();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.fragmentHolder,mapFragment);
+        fragmentTransaction.commit();*/
+
+        /*mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        mapFragment.getMapAsync(this);*/
 
     }
     @Override
@@ -308,9 +322,15 @@ public class EmployeeDetails extends AppCompatActivity
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            GeneralQueryFragment generalQueryFragment = new GeneralQueryFragment();
+            fragmentTransaction.replace(R.id.fragmentHolder,generalQueryFragment);
+            fragmentTransaction.commit();
         } else if (id == R.id.nav_gallery) {
-
-
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            GoogleMapFragment googleMapFragment = new GoogleMapFragment();
+            fragmentTransaction.replace(R.id.fragmentHolder,googleMapFragment);
+            fragmentTransaction.commit();
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
@@ -329,6 +349,11 @@ public class EmployeeDetails extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+
     //Code for getting Logged in Credentials from SignInActivity
     /*protected void onActivityResult(int reqCode,int resCode, Intent dt)
     {
@@ -344,7 +369,7 @@ public class EmployeeDetails extends AppCompatActivity
 
     }*/
 
-    //Code for getting Selected Pointer from Place Picker
+    /*//Code for getting Selected Pointer from Place Picker
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK) {
@@ -359,9 +384,9 @@ public class EmployeeDetails extends AppCompatActivity
                 if(attributions == null){
                     attributions = "";
                 }
-                /*tv_location_name.setText(name);
+                *//*tv_location_name.setText(name);
                 tv_location_address.setText(address);
-                tv_location_attributes.setText(attributions);*/
+                tv_location_attributes.setText(attributions);*//*
 
                 args.putParcelable("coordinates",userinfo.getCoordinates());
                 mReceivedLocation = userinfo.getCoordinates();
@@ -371,20 +396,20 @@ public class EmployeeDetails extends AppCompatActivity
                         .snippet("Selected Location"));
                 refreshMap(mMap);
                 markStartingLocationOnMap(mMap, mReceivedLocation);
-                /*Intent i = new Intent(EmployeeDetails.this,MapsActivity.class);
+                *//*Intent i = new Intent(EmployeeDetails.this,MapsActivity.class);
                 i.putExtra("bundle",args);
-                startActivity(i);*/
-                /*String toastMsg = String.format("Place: %s", place.getName());
-                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();*/
+                startActivity(i);*//*
+                *//*String toastMsg = String.format("Place: %s", place.getName());
+                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();*//*
             }
         }else {
             Bundle bundle = getIntent().getParcelableExtra("bundle");
             mReceivedLocation = bundle.getParcelable("coordinates");
             Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
-        /*mMap.addMarker(new MarkerOptions()
+        *//*mMap.addMarker(new MarkerOptions()
                 .title(getString(R.string.title_activity_maps))
                 .position(mReceivedLocation)
-                .snippet("Selected Location"));*/
+                .snippet("Selected Location"));*//*
 
         }
     }
@@ -393,8 +418,8 @@ public class EmployeeDetails extends AppCompatActivity
     }
 
     //Database
-    /*FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference mDatabase = database.getReference("message");*/
+    *//*FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference mDatabase = database.getReference("message");*//*
     //myRef.setValue("Hello, World!");
     private void createUser(String name,String email, String number)
     {
@@ -454,9 +479,9 @@ public class EmployeeDetails extends AppCompatActivity
         }
 
         if(mAuth.getInstance().getCurrentUser().getUid() == null){
-            /*Intent i = new Intent(EmployeeDetails.this,SignInActivity.class);
+            *//*Intent i = new Intent(EmployeeDetails.this,SignInActivity.class);
             Toast.makeText(this, "Please Login again!", Toast.LENGTH_SHORT).show();
-            startActivity(i);*/
+            startActivity(i);*//*
         }else
             uid = mAuth.getInstance().getCurrentUser().getUid();
         user = new UserInfo(name,"563225635",email,temp_address,temp_coordinates);
@@ -480,13 +505,13 @@ public class EmployeeDetails extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        /*if(mReceivedLocation != null)
+        *//*if(mReceivedLocation != null)
         {
             mMap.addMarker(new MarkerOptions()
                     .title(getString(R.string.title_activity_maps))
                     .position(mReceivedLocation)
                     .snippet("Selected Location"));
-        }*/
+        }*//*
         updateLocationUI();
         //getDeviceLocation();
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter()
@@ -518,9 +543,9 @@ public class EmployeeDetails extends AppCompatActivity
             markStartingLocationOnMap(mMap, mReceivedLocation);
         }
         // Add a marker in Sydney and move the camera
-        /*LatLng sydney = new LatLng(-34, 151);
+        *//*LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*//*
 
         //Code for InfoWindow press action
         mMap.setOnInfoWindowClickListener(this);
@@ -587,11 +612,11 @@ public class EmployeeDetails extends AppCompatActivity
         if (mMap == null) {
             return;
         }
-    /*
+    *//*
      * Request location permission, so that we can get the location of the
      * device. The result of the permission request is handled by a callback,
      * onRequestPermissionsResult.
-     */
+     *//*
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -618,6 +643,6 @@ public class EmployeeDetails extends AppCompatActivity
 
         mapObject.addMarker(new MarkerOptions().position(location).title("Selected location"));
         mapObject.moveCamera(CameraUpdateFactory.newLatLng(location));
-    }
+    }*/
 }
 
