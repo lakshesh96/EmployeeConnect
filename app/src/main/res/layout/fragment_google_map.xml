@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="bank.axis.nearbyme.GoogleMapFragment">
+    tools:context="bank.axis.nearbyme.GoogleMapFragment"
+    android:background="@android:color/background_light">
 
     <!-- TODO: Update blank fragment layout -->
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
@@ -14,8 +15,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="bank.axis.nearbyme.EmployeeDetails" />
-    <android.support.design.widget.FloatingActionButton
+    <fragment
+        android:id="@+id/place_autocomplete_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:name="com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment"
+        app:backgroundTint="@android:color/background_light"
+        />
+    <!--<android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
+        android:visibility="gone"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_gravity="bottom|left"
@@ -24,6 +33,5 @@
         app:elevation="5dp"
         app:fabSize="mini"
         app:layout_anchor="@+id/include"
-        app:srcCompat="@drawable/nearme" />
-
+        app:srcCompat="@drawable/nearme" />-->
 </FrameLayout>

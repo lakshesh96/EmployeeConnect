@@ -1,37 +1,53 @@
 package bank.axis.nearbyme.Database;
 
-import com.google.android.gms.maps.model.LatLng;
-
 /**
  * Created by LAKSHESH on 13-Jun-17.
  */
 
 public class UserInfo {
-    private String id;
-    private String name;
-    private String phoneNumber;
-    private String email;
-    private String address;
-    private LatLng coordinates;
-    private String pincode;
-
-    public UserInfo(){}
-
-    public UserInfo(String name,String phoneNumber,String email,String address,LatLng coordinates){
-        this.name = name;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-        this.address = address;
-        this.coordinates = coordinates;
-    }
-
-    /*public String getId() {
+    public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
-    }*/
+    }
+
+    private String id;
+    private String name;
+    private String phoneNumber;
+    private String email;
+    private String address;
+    private double latitude;
+    private double longitude;
+    private String pincode;
+    private String locality;
+
+
+    public UserInfo(){}
+
+    public UserInfo(String name,String phoneNumber,String email,String address){
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.address = address;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
 
     public String getName() {
         return name;
@@ -65,13 +81,7 @@ public class UserInfo {
         this.address = address;
     }
 
-    public LatLng getCoordinates() {
-        return coordinates;
-    }
 
-    public void setCoordinates(LatLng coordinates) {
-        this.coordinates = coordinates;
-    }
     public String getPincode() {
         return pincode;
     }
@@ -79,4 +89,14 @@ public class UserInfo {
     public void setPincode(String pincode) {
         this.pincode = pincode;
     }
+
+    public String getLocality(){
+        return locality;
+    }
+
+    public void setLocality(String locality){
+        this.locality = locality;
+    }
+
+
 }
