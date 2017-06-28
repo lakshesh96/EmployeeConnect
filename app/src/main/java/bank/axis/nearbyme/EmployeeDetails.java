@@ -194,12 +194,13 @@ public class EmployeeDetails extends AppCompatActivity
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
-            off.signOut();
-            Intent i = new Intent(EmployeeDetails.this,SignInActivity.class);
+            FirebaseAuth.getInstance().signOut();
+            Intent i = new Intent(this,SignInActivity.class);
             startActivity(i);
+            finish();
         } else if (id == R.id.nav_send) {
-            off.revokeAccess();
-            System.exit(1);
+            //off.revokeAccess();
+            //System.exit(1);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

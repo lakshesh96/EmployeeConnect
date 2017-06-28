@@ -72,6 +72,7 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback,/*
     private DatabaseReference mDatabase;
     private int PLACE_PICKER_REQUEST = 1;
     private GoogleClientCallBack googleClientCallBack;
+    private SharedPreferences sharedPref;
 
     public GoogleMapFragment() {
     }
@@ -90,6 +91,8 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback,/*
         super.onCreate(savedInstanceState);
         userinfo = new UserInfo();
         googleClientCallBack = this;
+        sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+
         if(GoogleClient.getGoogleApiClient() == null){
             new GoogleClient(getActivity(),googleClientCallBack);
         }else{
@@ -176,6 +179,7 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback,/*
                 userinfo.setLongitude(place.getLatLng().longitude);
                 mReceivedLocation = new LatLng(userinfo.getLatitude(),userinfo.getLongitude());
                 mMap.clear();
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(mReceivedLocation));
                 mMap.addMarker(new MarkerOptions()
                         .title(place.getName().toString())
                         .position(mReceivedLocation)
@@ -336,7 +340,7 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback,/*
             userinfo.setPincode(addresses.get(0).getPostalCode());
             userinfo.setLocality(addresses.get(0).getLocality());
 
-            SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+//            SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString("locality",addresses.get(0).getLocality());
             editor.commit();
@@ -403,12 +407,24 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback,/*
         LatLng cord = new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
         userinfo.setLatitude(cord.latitude);
         userinfo.setLongitude(cord.longitude);
+        geocoder = new Geocoder(getActivity(),Locale.getDefault());
+        try{
+            addresses = geocoder.getFromLocation(cord.latitude,cord.longitude,1);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("locality",addresses.get(0).getLocality());
+            editor.commit();
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
         mMap.addMarker(new MarkerOptions()
                 .title(getString(R.string.title_activity_maps))
                 .position(cord)
                 .snippet("Selected Location")
                 .draggable(true));
         mMap.clear();
+        mMap.setPadding(0,200,0,0);
         mMap.setMyLocationEnabled(true);
         markStartingLocationOnMap(mMap, cord);
 

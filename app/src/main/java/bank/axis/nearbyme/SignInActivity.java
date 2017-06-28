@@ -3,7 +3,6 @@ package bank.axis.nearbyme;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -61,7 +60,7 @@ public class SignInActivity extends AppCompatActivity implements
         bt_disconnect.setVisibility(View.INVISIBLE);
         userInfo = new UserInfo();
 
-        try {
+        /*try {
             int off = Settings.Secure.getInt(getContentResolver(), Settings.Secure.LOCATION_MODE);
             if(off==0){
                 Intent gpsOptionsIntent = new Intent (android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
@@ -70,7 +69,7 @@ public class SignInActivity extends AppCompatActivity implements
             }
         } catch (Settings.SettingNotFoundException e) {
             e.printStackTrace();
-        }
+        }*/
         //GPS Permission
         /*
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
@@ -81,6 +80,18 @@ public class SignInActivity extends AppCompatActivity implements
         } else {
 
         }*/
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestIdToken("355485271926-7urd9ctu0h1r6k6tqbtt3han3s6ig0fg.apps.googleusercontent.com")
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+        mAuth = FirebaseAuth.getInstance();
+
         ActivityCompat.requestPermissions(this,
                 new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                 PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
@@ -98,7 +109,8 @@ public class SignInActivity extends AppCompatActivity implements
                     // and the GoogleSignInResult will be available instantly.
                     Log.d(TAG, "Got cached sign-in");
                     GoogleSignInResult result = opr.get();
-                    handleSignInResult(result);
+                    //handleSignInResult(result);
+                    firebaseAuthWithGoogle(result);
                     //GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent();
 //                    GoogleSignInAccount acct = result.getSignInAccount();
 //                    textView.setText(acct.getDisplayName());
@@ -140,22 +152,11 @@ public class SignInActivity extends AppCompatActivity implements
             }
         });
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestIdToken("355485271926-7urd9ctu0h1r6k6tqbtt3han3s6ig0fg.apps.googleusercontent.com")
-                .build();
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-        mAuth = FirebaseAuth.getInstance();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
 
     }
 
@@ -170,11 +171,12 @@ public class SignInActivity extends AppCompatActivity implements
 
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            handleSignInResult(result);
+            firebaseAuthWithGoogle(result);
         }
     }
 
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+    private void firebaseAuthWithGoogle(final GoogleSignInResult result) {
+        GoogleSignInAccount acct = result.getSignInAccount();
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
         showProgressDialog();
 
@@ -186,6 +188,7 @@ public class SignInActivity extends AppCompatActivity implements
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
+                            handleSignInResult(result);
                             user = mAuth.getCurrentUser();
                             //updateUI(user);
                         } else {
@@ -204,7 +207,7 @@ public class SignInActivity extends AppCompatActivity implements
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            firebaseAuthWithGoogle(acct);
+            //firebaseAuthWithGoogle(acct);
             Toast.makeText(this, "Welcome "+acct.getDisplayName(), Toast.LENGTH_LONG).show();
             Intent i = new Intent(SignInActivity.this,EmployeeDetails.class);
             i.putExtra("key1",acct.getDisplayName());
@@ -215,6 +218,7 @@ public class SignInActivity extends AppCompatActivity implements
             //i.putExtra("uid",uid);
             //i.putExtra("key4",mGoogleApiClient.toString());
             startActivity(i);
+            finish();
             //updateUI(true);
         } else {
             // Signed out, show unauthenticated UI.
