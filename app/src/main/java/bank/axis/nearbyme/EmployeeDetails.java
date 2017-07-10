@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -19,9 +19,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -34,12 +31,12 @@ import bank.axis.nearbyme.UserDetails.UsersModel;
 
 
 public class EmployeeDetails extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,GeneralQueryFragment.OnFragmentInteractionListener,GoogleMapFragment.OnFragmentInteractionListener  {
+        implements NavigationView.OnNavigationItemSelectedListener,GeneralQueryFragment.OnFragmentInteractionListener,GoogleMapFragment.OnFragmentInteractionListener,FirebaseAuth.AuthStateListener  {
 
     TextView et_name,et_email,et_number,tv_location_name,tv_location_address,tv_location_attributes;
     ImageView profile_image;
     FirebaseAuth mAuth;
-    String name,email;
+    String name,email,photourl;
     private String uid;
     UserInfo userinfo;
     //Database
@@ -52,6 +49,7 @@ public class EmployeeDetails extends AppCompatActivity
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
     private Bundle googleMapData;
+    private Bundle googleMapGeneralQueryFragmentData;
 
 
     // Keys for storing activity state.
@@ -85,7 +83,7 @@ public class EmployeeDetails extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -102,7 +100,7 @@ public class EmployeeDetails extends AppCompatActivity
                 }
 
             }
-        });
+        });*/
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -121,7 +119,7 @@ public class EmployeeDetails extends AppCompatActivity
         Bundle extras = getIntent().getExtras();
         name = (String) extras.get("key1");
         email = (String) extras.get("key2");
-        String photourl = (String) extras.get("key3");
+        photourl = (String) extras.get("key3");
         et_name.setText(name);
         et_email.setText(email);
         new ImageLoadTask(photourl,profile_image).execute();
@@ -131,19 +129,39 @@ public class EmployeeDetails extends AppCompatActivity
         }
         fragmentManager = getSupportFragmentManager();
 
-
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         GoogleMapFragment googleMapFragment = new GoogleMapFragment();
         googleMapData = new Bundle();
+        googleMapGeneralQueryFragmentData = new Bundle();
 
         mAuth = FirebaseAuth.getInstance();
         uid = mAuth.getCurrentUser().getUid();
         googleMapData.putString("UID",uid);
         googleMapData.putString("NAME",name);
         googleMapData.putString("EMAIL",email);
+        googleMapData.putString("PHOTOURL",photourl);
+        googleMapGeneralQueryFragmentData.putString("UID",uid);
+
         googleMapFragment.setArguments(googleMapData);
         fragmentTransaction.add(R.id.fragmentHolder,googleMapFragment);
         fragmentTransaction.commit();
+
+        profile_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle b = new Bundle();
+                b.putString("photoURL",photourl);
+                b.putString("name",name);
+                b.putString("email",email);
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                ProfileActivity profileActivity = new ProfileActivity();
+                profileActivity.setArguments(b);
+                fragmentTransaction.replace(R.id.fragmentHolder,profileActivity);
+                fragmentTransaction.commit();
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
+            }
+        });
 
     }
     @Override
@@ -180,8 +198,10 @@ public class EmployeeDetails extends AppCompatActivity
         if (id == R.id.nav_camera) {
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             GeneralQueryFragment generalQueryFragment = new GeneralQueryFragment();
+            generalQueryFragment.setArguments(googleMapGeneralQueryFragmentData);
             fragmentTransaction.replace(R.id.fragmentHolder,generalQueryFragment);
             fragmentTransaction.commit();
+
         } else if (id == R.id.nav_gallery) {
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             GoogleMapFragment googleMapFragment = new GoogleMapFragment();
@@ -190,15 +210,26 @@ public class EmployeeDetails extends AppCompatActivity
             fragmentTransaction.commit();
         } else if (id == R.id.nav_slideshow) {
 
-        } else if (id == R.id.nav_manage) {
+            /*Intent i = new Intent(EmployeeDetails.this,ProfileActivity.class);
+            i.putExtra("photoURL",photourl);
+            i.putExtra("name",name);
+            i.putExtra("email",email);
+            startActivity(i);*/
+            Bundle b = new Bundle();
+            b.putString("photoURL",photourl);
+            b.putString("name",name);
+            b.putString("email",email);
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            ProfileActivity profileActivity = new ProfileActivity();
+            profileActivity.setArguments(b);
+            fragmentTransaction.replace(R.id.fragmentHolder,profileActivity);
+            fragmentTransaction.commit();
 
         } else if (id == R.id.nav_share) {
-            off.signOut();
-            Intent i = new Intent(EmployeeDetails.this,SignInActivity.class);
+            FirebaseAuth.getInstance().signOut();
+            Intent i = new Intent(this,SignInActivity.class);
             startActivity(i);
-        } else if (id == R.id.nav_send) {
-            off.revokeAccess();
-            System.exit(1);
+            finish();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -209,6 +240,22 @@ public class EmployeeDetails extends AppCompatActivity
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    @Override
+    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        GoogleMapFragment googleMapFragment = new GoogleMapFragment();
+        googleMapData = new Bundle();
+        mAuth = FirebaseAuth.getInstance();
+        uid = mAuth.getCurrentUser().getUid();
+        googleMapData.putString("UID",uid);
+        googleMapData.putString("NAME",name);
+        googleMapData.putString("EMAIL",email);
+        googleMapFragment.setArguments(googleMapData);
+        fragmentTransaction.add(R.id.fragmentHolder,googleMapFragment);
+        fragmentTransaction.commit();
     }
 }
 

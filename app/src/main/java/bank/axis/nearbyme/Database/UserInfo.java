@@ -1,37 +1,48 @@
 package bank.axis.nearbyme.Database;
 
-import com.google.android.gms.maps.model.LatLng;
+import java.io.Serializable;
 
 /**
  * Created by LAKSHESH on 13-Jun-17.
  */
 
-public class UserInfo {
+public class UserInfo implements Serializable{
+
     private String id;
     private String name;
     private String phoneNumber;
     private String email;
     private String address;
-    private LatLng coordinates;
+    private double latitude;
+    private double longitude;
     private String pincode;
+    private String locality;
+    private  String photoURL;
 
     public UserInfo(){}
 
-    public UserInfo(String name,String phoneNumber,String email,String address,LatLng coordinates){
+    public UserInfo(String name,String phoneNumber,String email,String address){
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.address = address;
-        this.coordinates = coordinates;
     }
 
-    /*public String getId() {
-        return id;
+    public double getLatitude() {
+        return latitude;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }*/
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
 
     public String getName() {
         return name;
@@ -65,13 +76,7 @@ public class UserInfo {
         this.address = address;
     }
 
-    public LatLng getCoordinates() {
-        return coordinates;
-    }
 
-    public void setCoordinates(LatLng coordinates) {
-        this.coordinates = coordinates;
-    }
     public String getPincode() {
         return pincode;
     }
@@ -79,4 +84,28 @@ public class UserInfo {
     public void setPincode(String pincode) {
         this.pincode = pincode;
     }
+
+    public String getLocality(){
+        return locality;
+    }
+
+    public void setLocality(String locality){
+        this.locality = locality;
+    }
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getPhotoURL() {
+        return photoURL;
+    }
+
+    public void setPhotoURL(String photoURL) {
+        this.photoURL = photoURL;
+    }
+
 }

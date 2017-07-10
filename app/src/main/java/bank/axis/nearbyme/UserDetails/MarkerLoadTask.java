@@ -1,39 +1,31 @@
-package bank.axis.nearbyme;
+package bank.axis.nearbyme.UserDetails;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.widget.ImageView;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Created by LAKSHESH on 02-Jun-17.
+ * Created by LAKSHESH on 29-Jun-17.
  */
 
-/*public class ImageLoadTask extends AsyncTask {
-    @Override
-    protected Object doInBackground(Object[] params) {
-        return null;
-    }
-}*/
+public class MarkerLoadTask extends AsyncTask<Void, Void, Bitmap> {
+    private String photoURL;
 
-public class ImageLoadTask extends AsyncTask<Void, Void, Bitmap> {
+    public MarkerLoadTask(){}
 
-    private String url;
-    private ImageView imageView;
-
-    public ImageLoadTask(String url, ImageView imageView) {
-        this.url = url;
-        this.imageView = imageView;
+    public MarkerLoadTask(String photoURL){
+        this.photoURL = photoURL;
     }
 
     @Override
     protected Bitmap doInBackground(Void... params) {
+
         try {
-            URL urlConnection = new URL(url);
+            URL urlConnection = new URL(photoURL);
             HttpURLConnection connection = (HttpURLConnection) urlConnection
                     .openConnection();
             connection.setDoInput(true);
@@ -50,14 +42,7 @@ public class ImageLoadTask extends AsyncTask<Void, Void, Bitmap> {
     @Override
     protected void onPostExecute(Bitmap result) {
         super.onPostExecute(result);
-        //imageView.setImageBitmap(result);
-        if(result == null){
-            imageView.setImageResource(R.drawable.powered_by_google_dark);
-        }else {
-            Bitmap b = result;
-            imageView.setImageBitmap(Bitmap.createScaledBitmap(b, 250, 250, false));
-        }
 
+        Bitmap b = result;
     }
-
 }
