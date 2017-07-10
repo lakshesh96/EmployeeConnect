@@ -13,7 +13,7 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:scaleType="fitXY"
-            android:src="@drawable/places_ic_search" />
+            android:src="@drawable/profile_background2" />
 
         <ImageView
             android:id="@+id/iv_profile_img"
