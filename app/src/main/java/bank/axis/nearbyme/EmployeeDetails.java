@@ -36,7 +36,7 @@ public class EmployeeDetails extends AppCompatActivity
     TextView et_name,et_email,et_number,tv_location_name,tv_location_address,tv_location_attributes;
     ImageView profile_image;
     FirebaseAuth mAuth;
-    String name,email;
+    String name,email,photourl;
     private String uid;
     UserInfo userinfo;
     //Database
@@ -119,7 +119,7 @@ public class EmployeeDetails extends AppCompatActivity
         Bundle extras = getIntent().getExtras();
         name = (String) extras.get("key1");
         email = (String) extras.get("key2");
-        String photourl = (String) extras.get("key3");
+        photourl = (String) extras.get("key3");
         et_name.setText(name);
         et_email.setText(email);
         new ImageLoadTask(photourl,profile_image).execute();
@@ -139,11 +139,30 @@ public class EmployeeDetails extends AppCompatActivity
         googleMapData.putString("UID",uid);
         googleMapData.putString("NAME",name);
         googleMapData.putString("EMAIL",email);
+        googleMapData.putString("PHOTOURL",photourl);
         googleMapGeneralQueryFragmentData.putString("UID",uid);
 
         googleMapFragment.setArguments(googleMapData);
         fragmentTransaction.add(R.id.fragmentHolder,googleMapFragment);
         fragmentTransaction.commit();
+
+        profile_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle b = new Bundle();
+                b.putString("photoURL",photourl);
+                b.putString("name",name);
+                b.putString("email",email);
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                ProfileActivity profileActivity = new ProfileActivity();
+                profileActivity.setArguments(b);
+                fragmentTransaction.replace(R.id.fragmentHolder,profileActivity);
+                fragmentTransaction.commit();
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
+            }
+        });
+
     }
     @Override
     public void onBackPressed() {
@@ -191,16 +210,26 @@ public class EmployeeDetails extends AppCompatActivity
             fragmentTransaction.commit();
         } else if (id == R.id.nav_slideshow) {
 
-        } else if (id == R.id.nav_manage) {
+            /*Intent i = new Intent(EmployeeDetails.this,ProfileActivity.class);
+            i.putExtra("photoURL",photourl);
+            i.putExtra("name",name);
+            i.putExtra("email",email);
+            startActivity(i);*/
+            Bundle b = new Bundle();
+            b.putString("photoURL",photourl);
+            b.putString("name",name);
+            b.putString("email",email);
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            ProfileActivity profileActivity = new ProfileActivity();
+            profileActivity.setArguments(b);
+            fragmentTransaction.replace(R.id.fragmentHolder,profileActivity);
+            fragmentTransaction.commit();
 
         } else if (id == R.id.nav_share) {
             FirebaseAuth.getInstance().signOut();
             Intent i = new Intent(this,SignInActivity.class);
             startActivity(i);
             finish();
-        } else if (id == R.id.nav_send) {
-            //off.revokeAccess();
-            //System.exit(1);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

@@ -1,17 +1,12 @@
 package bank.axis.nearbyme.Database;
 
+import java.io.Serializable;
+
 /**
  * Created by LAKSHESH on 13-Jun-17.
  */
 
-public class UserInfo {
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+public class UserInfo implements Serializable{
 
     private String id;
     private String name;
@@ -22,7 +17,7 @@ public class UserInfo {
     private double longitude;
     private String pincode;
     private String locality;
-
+    private  String photoURL;
 
     public UserInfo(){}
 
@@ -97,6 +92,20 @@ public class UserInfo {
     public void setLocality(String locality){
         this.locality = locality;
     }
+    public String getId() {
+        return id;
+    }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getPhotoURL() {
+        return photoURL;
+    }
+
+    public void setPhotoURL(String photoURL) {
+        this.photoURL = photoURL;
+    }
 
 }

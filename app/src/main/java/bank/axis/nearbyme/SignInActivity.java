@@ -1,10 +1,16 @@
 package bank.axis.nearbyme;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -16,7 +22,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -44,8 +49,10 @@ public class SignInActivity extends AppCompatActivity implements
     private FirebaseAuth mAuth;
     private FirebaseUser user;
 
-    Button bt_logout,bt_disconnect;
-    int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    Button bt_logout,bt_disconnect,signInButton;
+    private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private final int MY_PERMISSIONS_REQUEST_INTERNET = 2;
+    private final int MY_PERMISSIONS_REQUEST_ACCESS_NETWORK_STATE = 3;
     String uid;
     UserInfo userInfo;
 
@@ -59,6 +66,7 @@ public class SignInActivity extends AppCompatActivity implements
         bt_logout.setVisibility(View.INVISIBLE);
         bt_disconnect.setVisibility(View.INVISIBLE);
         userInfo = new UserInfo();
+        signInButton = (Button) findViewById(R.id.sign_in_button);
 
         /*try {
             int off = Settings.Secure.getInt(getContentResolver(), Settings.Secure.LOCATION_MODE);
@@ -92,66 +100,86 @@ public class SignInActivity extends AppCompatActivity implements
                 .build();
         mAuth = FirebaseAuth.getInstance();
 
+
         ActivityCompat.requestPermissions(this,
                 new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+                MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
 
+        ActivityCompat.requestPermissions(this,
+                new String[]{android.Manifest.permission.ACCESS_NETWORK_STATE},
+                MY_PERMISSIONS_REQUEST_ACCESS_NETWORK_STATE);
 
-        SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
-        signInButton.setSize(SignInButton.SIZE_STANDARD);
+        Boolean check = isNetworkAvailable();
+        if(check == null){
+            AlertDialog.Builder builder = new AlertDialog.Builder(SignInActivity.this);
+            builder.setTitle("Error!").setIcon(android.R.drawable.ic_dialog_alert).setMessage("Please provide necessary permissions to proceed.");
+            builder.show();
+        }
 
-        signInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
-                if (opr.isDone()) {
-                    // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
-                    // and the GoogleSignInResult will be available instantly.
-                    Log.d(TAG, "Got cached sign-in");
-                    GoogleSignInResult result = opr.get();
-                    //handleSignInResult(result);
-                    firebaseAuthWithGoogle(result);
-                    //GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent();
-//                    GoogleSignInAccount acct = result.getSignInAccount();
-//                    textView.setText(acct.getDisplayName());
-//                    Intent i = new Intent(SignInActivity.this,EmployeeDetails.class);
-//                    i.putExtra("key1",acct.getDisplayName());
-//                    //Log.d(TAG, acct.getDisplayName());
-//                    i.putExtra("key2",acct.getEmail());
-//                    //Log.d(TAG, acct.getEmail());
-//                    i.putExtra("key3",acct.getPhotoUrl());
-//                    startActivity(i);
+        if (ContextCompat.checkSelfPermission(SignInActivity.this,
+                android.Manifest.permission.INTERNET)/* +
+                ContextCompat.checkSelfPermission(SignInActivity.this,
+                        android.Manifest.permission.ACCESS_FINE_LOCATION)*/
+                != PackageManager.PERMISSION_GRANTED){
 
-                } else {
-                    // If the user has not previously signed in on this device or the sign-in has expired,
-                    // this asynchronous branch will attempt to sign in the user silently.  Cross-device
-                    // single sign-on will occur in this branch.
-                    showProgressDialog();
-                    opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
-                        @Override
-                        public void onResult(GoogleSignInResult googleSignInResult) {
-                            hideProgressDialog();
-                            //handleSignInResult(googleSignInResult);
-                        }
-                    });
-                }
+            ActivityCompat.requestPermissions(SignInActivity.this,
+                    new String[]{android.Manifest.permission.INTERNET},
+                    MY_PERMISSIONS_REQUEST_INTERNET);
+            /*
+
+            */
+
+            /*ActivityCompat.requestPermissions(SignInActivity.this,
+                    new String[]{android.Manifest.permission.INTERNET,
+                                android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_INTERNET_AND_LOCATION);*/
+        }
+        else{
+
+            OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+            if (opr.isDone()) {
+
+                Log.d(TAG, "Got cached sign-in");
+                GoogleSignInResult result = opr.get();
+                firebaseAuthWithGoogle(result);
                 signIn();
             }
-        });
+            signInButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+                    if (opr.isDone()) {
 
-        bt_logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signOut();
-            }
-        });
-        bt_disconnect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                revokeAccess();
-            }
-        });
+                        Log.d(TAG, "Got cached sign-in");
+                        GoogleSignInResult result = opr.get();
+                        firebaseAuthWithGoogle(result);
 
+                    } else {
+                        showProgressDialog();
+                        opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                            @Override
+                            public void onResult(GoogleSignInResult googleSignInResult) {
+                                hideProgressDialog();
+                            }
+                        });
+                    }
+                    signIn();
+                }
+            });
+
+            bt_logout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    signOut();
+                }
+            });
+            bt_disconnect.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    revokeAccess();
+                }
+            });
+        }
     }
 
     @Override
@@ -194,8 +222,10 @@ public class SignInActivity extends AppCompatActivity implements
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            Toast.makeText(SignInActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(SignInActivity.this);
+                            builder.setTitle("Oops!").setIcon(android.R.drawable.ic_dialog_alert).setMessage("Authentication failed, Please Check your Network Connections");
+                            builder.show();
                             //updateUI(null);
                         }
                         hideProgressDialog();
@@ -208,7 +238,7 @@ public class SignInActivity extends AppCompatActivity implements
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
             //firebaseAuthWithGoogle(acct);
-            Toast.makeText(this, "Welcome "+acct.getDisplayName(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Welcome "+acct.getDisplayName(), Toast.LENGTH_SHORT).show();
             Intent i = new Intent(SignInActivity.this,EmployeeDetails.class);
             i.putExtra("key1",acct.getDisplayName());
             i.putExtra("key2",acct.getEmail());
@@ -293,5 +323,119 @@ public class SignInActivity extends AppCompatActivity implements
                 revokeAccess();
                 break;
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_INTERNET: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    signInButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+                            if (opr.isDone()) {
+
+                                Log.d(TAG, "Got cached sign-in");
+                                GoogleSignInResult result = opr.get();
+                                firebaseAuthWithGoogle(result);
+
+                            } else {
+                                showProgressDialog();
+                                opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                                    @Override
+                                    public void onResult(GoogleSignInResult googleSignInResult) {
+                                        hideProgressDialog();
+                                    }
+                                });
+                            }
+                            signIn();
+                        }
+                    });
+
+                    bt_logout.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            signOut();
+                        }
+                    });
+                    bt_disconnect.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            revokeAccess();
+                        }
+                    });
+
+
+                } else {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(SignInActivity.this);
+                    builder.setTitle("Error!").setIcon(android.R.drawable.ic_dialog_alert).setMessage("Please connect to Internet before proceeding.");
+                    builder.show();
+                }
+                return;
+            }
+            /*case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    signInButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+                            if (opr.isDone()) {
+
+                                Log.d(TAG, "Got cached sign-in");
+                                GoogleSignInResult result = opr.get();
+                                firebaseAuthWithGoogle(result);
+
+                            } else {
+                                showProgressDialog();
+                                opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                                    @Override
+                                    public void onResult(GoogleSignInResult googleSignInResult) {
+                                        hideProgressDialog();
+                                    }
+                                });
+                            }
+                            signIn();
+                        }
+                    });
+
+                    bt_logout.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            signOut();
+                        }
+                    });
+                    bt_disconnect.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            revokeAccess();
+                        }
+                    });
+
+
+                } else {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(SignInActivity.this);
+                    builder.setTitle("Error!").setIcon(android.R.drawable.ic_dialog_alert).setMessage("Please connect to Internet before proceeding.");
+                    builder.show();
+                }
+                return;
+            }*/
+        }
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

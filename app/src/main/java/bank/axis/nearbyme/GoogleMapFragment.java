@@ -34,7 +34,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 
@@ -65,7 +64,7 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback,/*
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private Location mLastKnownLocation;
     UserInfo userinfo;
-    String name,email;
+    String name,email,photourl;
     Geocoder geocoder;
     List<Address> addresses;
     FirebaseAuth mAuth;
@@ -73,6 +72,7 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback,/*
     private int PLACE_PICKER_REQUEST = 1;
     private GoogleClientCallBack googleClientCallBack;
     private SharedPreferences sharedPref;
+    private String MY_PREFS_NAME = "MyLocationData";
 
     public GoogleMapFragment() {
     }
@@ -91,7 +91,7 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback,/*
         super.onCreate(savedInstanceState);
         userinfo = new UserInfo();
         googleClientCallBack = this;
-        sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        sharedPref = getActivity().getSharedPreferences(MY_PREFS_NAME,Context.MODE_PRIVATE);
 
         if(GoogleClient.getGoogleApiClient() == null){
             new GoogleClient(getActivity(),googleClientCallBack);
@@ -102,42 +102,18 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback,/*
             userID = getArguments().getString("UID");
             name = getArguments().getString("NAME");
             email = getArguments().getString("EMAIL");
+            photourl = getArguments().getString("PHOTOURL");
             userinfo.setName(name);
             userinfo.setEmail(email);
+            userinfo.setPhotoURL(photourl);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         mDatabase = DatabaseInstance.getFirebaseInstance().getReference();
-/*        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                    .enableAutoManage(getActivity(),this)
-                    .addConnectionCallbacks(this)
-                    .addApi(LocationServices.API)
-                    .addApi(Places.GEO_DATA_API)
-                    .addApi(Places.PLACE_DETECTION_API)
-                    .build();
-        mGoogleApiClient.connect();*/
 
         if(GoogleClient.getGoogleApiClient() == null){
             new GoogleClient(getActivity(),googleClientCallBack);
         }
 
-        /*FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-
-                    PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-                    Intent i2 = builder.build(getActivity());
-                    startActivityForResult(i2, PLACE_PICKER_REQUEST);
-
-                } catch (GooglePlayServicesRepairableException e) {
-                    e.printStackTrace();
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        });*/
 
     }
 
@@ -329,10 +305,8 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback,/*
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        Toast.makeText(getActivity(), "Info window clicked", Toast.LENGTH_SHORT).show();
         LatLng temp_coordinates;
         temp_coordinates = new LatLng(userinfo.getLatitude(),userinfo.getLongitude());
-
         geocoder = new Geocoder(getActivity(), Locale.getDefault());
         try {
             addresses = geocoder.getFromLocation(temp_coordinates.latitude,temp_coordinates.longitude,1);
@@ -340,7 +314,6 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback,/*
             userinfo.setPincode(addresses.get(0).getPostalCode());
             userinfo.setLocality(addresses.get(0).getLocality());
 
-//            SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString("locality",addresses.get(0).getLocality());
             editor.commit();
@@ -349,20 +322,22 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback,/*
             e.printStackTrace();
         }
         userinfo.setId(userID);
-/*        mDatabase.child("Users").child(userID).setValue(userinfo).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Toast.makeText(getActivity(), "User Added Successfully", Toast.LENGTH_SHORT).show();
-            }
-        });*/
 
-        //Cluster cluster = new Cluster(uid,temp_coordinates);
-        mDatabase.child("Cluster").child(userinfo.getLocality()).child(userinfo.getId()).setValue(userinfo).addOnSuccessListener(new OnSuccessListener<Void>() {
+
+        Intent i = new Intent(getActivity(),UploadDetailsForm.class);
+//        i.putExtra("name",userinfo.getName());
+        Bundle b = new Bundle();
+        b.putSerializable("userinfo", userinfo);
+        i.putExtras(b);
+        startActivity(i);
+
+
+        /*mDatabase.child("Cluster").child(userinfo.getLocality()).child(userinfo.getId()).setValue(userinfo).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Toast.makeText(getActivity(), "Cluster added Successfully", Toast.LENGTH_SHORT).show();
             }
-        });
+        });*/
 
 
     }
@@ -376,8 +351,9 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback,/*
 
     private void markStartingLocationOnMap(GoogleMap mapObject, LatLng location){
 
-        mapObject.addMarker(new MarkerOptions().position(location).title("Current location"));
+        Marker marker = mapObject.addMarker(new MarkerOptions().position(location).title("Current location"));
         mapObject.moveCamera(CameraUpdateFactory.newLatLng(location));
+        marker.showInfoWindow();
     }
 
     private void getDeviceLocation() {
@@ -430,32 +406,8 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback,/*
 
     }
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        /*if (requestCode == PLACE_PICKER_REQUEST) {
-            if (resultCode == RESULT_OK) {
-                Place place = PlacePicker.getPlace(data, getActivity());
-                final CharSequence name = place.getName();
-                userinfo.setAddress(place.getAddress().toString());
-                //userinfo.setCoordinates(place.getLatLng());
-                userinfo.setLatitude(place.getLatLng().latitude);
-                userinfo.setLongitude(place.getLatLng().longitude);
-                final Locale pin = place.getLocale();
-                String attributions = (String) place.getAttributions();
-                if(attributions == null){
-                    attributions = "";
-                }
-                //mReceivedLocation = userinfo.getCoordinates();
-                mReceivedLocation = new LatLng(userinfo.getLatitude(),userinfo.getLongitude());
-                mMap.addMarker(new MarkerOptions()
-                        .title(getString(R.string.title_activity_maps))
-                        .position(mReceivedLocation)
-                        .snippet("Selected Location"));
-                mMap.clear();
-                markStartingLocationOnMap(mMap, mReceivedLocation);
-            }
-        }else {*/
             Bundle bundle = getActivity().getIntent().getParcelableExtra("bundle");
             mReceivedLocation = bundle.getParcelable("coordinates");
             Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
-        //}
     }
 }
