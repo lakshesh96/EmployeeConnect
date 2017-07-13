@@ -20,6 +20,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -72,7 +73,8 @@ public class InfoWindowPersonDetails extends AppCompatActivity {
             locality = this.getIntent().getStringExtra("locality");
         }
         if (userInfo.getPhotoURL() != null) {
-            new ImageLoadTask(userInfo.getPhotoURL(), iv_profile_icon).execute();
+            //new ImageLoadTask(userInfo.getPhotoURL(), iv_profile_icon).execute();
+            Picasso.with(this).load(userInfo.getPhotoURL()).into(iv_profile_icon);
         } else
             iv_profile_icon.setImageResource(R.drawable.question_mark);
 

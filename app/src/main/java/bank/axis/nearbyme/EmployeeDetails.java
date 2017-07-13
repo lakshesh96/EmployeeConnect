@@ -24,6 +24,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
+import com.squareup.picasso.Picasso;
 
 import bank.axis.nearbyme.Database.DatabaseInstance;
 import bank.axis.nearbyme.Database.UserInfo;
@@ -122,14 +123,23 @@ public class EmployeeDetails extends AppCompatActivity
         photourl = (String) extras.get("key3");
         et_name.setText(name);
         et_email.setText(email);
-        new ImageLoadTask(photourl,profile_image).execute();
+        //new ImageLoadTask(photourl,profile_image).execute();
+        Picasso.with(this).load(photourl).resize(250,250).into(profile_image);
         if (savedInstanceState != null) {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
         fragmentManager = getSupportFragmentManager();
 
+
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        GeneralQueryFragment generalQueryFragment = new GeneralQueryFragment();
+        generalQueryFragment.setArguments(googleMapGeneralQueryFragmentData);
+        fragmentTransaction.replace(R.id.fragmentHolder,generalQueryFragment);
+        fragmentTransaction.commit();
+
+
+        /*FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         GoogleMapFragment googleMapFragment = new GoogleMapFragment();
         googleMapData = new Bundle();
         googleMapGeneralQueryFragmentData = new Bundle();
@@ -144,7 +154,7 @@ public class EmployeeDetails extends AppCompatActivity
 
         googleMapFragment.setArguments(googleMapData);
         fragmentTransaction.add(R.id.fragmentHolder,googleMapFragment);
-        fragmentTransaction.commit();
+        fragmentTransaction.commit();*/
 
         profile_image.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -162,6 +172,8 @@ public class EmployeeDetails extends AppCompatActivity
                 drawer.closeDrawer(GravityCompat.START);
             }
         });
+        Intent i = new Intent(this,UserEducationActivity_2.class);
+        startActivity(i);
 
     }
     @Override
@@ -210,11 +222,6 @@ public class EmployeeDetails extends AppCompatActivity
             fragmentTransaction.commit();
         } else if (id == R.id.nav_slideshow) {
 
-            /*Intent i = new Intent(EmployeeDetails.this,ProfileActivity.class);
-            i.putExtra("photoURL",photourl);
-            i.putExtra("name",name);
-            i.putExtra("email",email);
-            startActivity(i);*/
             Bundle b = new Bundle();
             b.putString("photoURL",photourl);
             b.putString("name",name);
@@ -227,7 +234,7 @@ public class EmployeeDetails extends AppCompatActivity
 
         } else if (id == R.id.nav_share) {
             FirebaseAuth.getInstance().signOut();
-            Intent i = new Intent(this,SignInActivity.class);
+            Intent i = new Intent(this,SignInEmailActivity.class);
             startActivity(i);
             finish();
         }

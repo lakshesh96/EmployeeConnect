@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -73,6 +74,9 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback,/*
     private GoogleClientCallBack googleClientCallBack;
     private SharedPreferences sharedPref;
     private String MY_PREFS_NAME = "MyLocationData";
+    private FragmentManager fragmentManager;
+    private Bundle googleMapGeneralQueryFragmentData;
+
 
     public GoogleMapFragment() {
     }
@@ -114,6 +118,18 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback,/*
             new GoogleClient(getActivity(),googleClientCallBack);
         }
 
+        //getParentFragment().getActivity().findViewById(R.id.nav_camera).performClick();
+        //getActivity().findViewById(R.id.nav_camera).performClick();
+
+
+        /*googleMapGeneralQueryFragmentData = new Bundle();
+        googleMapGeneralQueryFragmentData.putString("UID",userID);
+        fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        GeneralQueryFragment generalQueryFragment = new GeneralQueryFragment();
+        generalQueryFragment.setArguments(googleMapGeneralQueryFragmentData);
+        fragmentTransaction.replace(R.id.fragmentHolder,generalQueryFragment);
+        fragmentTransaction.commit();*/
 
     }
 

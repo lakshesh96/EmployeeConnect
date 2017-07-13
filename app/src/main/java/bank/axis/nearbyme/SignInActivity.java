@@ -12,9 +12,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -49,7 +51,8 @@ public class SignInActivity extends AppCompatActivity implements
     private FirebaseAuth mAuth;
     private FirebaseUser user;
 
-    Button bt_logout,bt_disconnect,signInButton;
+    EditText et_userid,et_pass;
+    Button signInButton,emailSignIn;
     private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private final int MY_PERMISSIONS_REQUEST_INTERNET = 2;
     private final int MY_PERMISSIONS_REQUEST_ACCESS_NETWORK_STATE = 3;
@@ -59,35 +62,37 @@ public class SignInActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_in);
+        setContentView(R.layout.activity_login_imported);
 
-        bt_logout = (Button) findViewById(R.id.bt_logout);
-        bt_disconnect = (Button) findViewById(R.id.bt_disconnect);
-        bt_logout.setVisibility(View.INVISIBLE);
-        bt_disconnect.setVisibility(View.INVISIBLE);
         userInfo = new UserInfo();
-        signInButton = (Button) findViewById(R.id.sign_in_button);
 
-        /*try {
-            int off = Settings.Secure.getInt(getContentResolver(), Settings.Secure.LOCATION_MODE);
-            if(off==0){
-                Intent gpsOptionsIntent = new Intent (android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                Toast.makeText(SignInActivity.this, "Please switch on GPS and then press Back", Toast.LENGTH_LONG).show();
-                startActivity(gpsOptionsIntent);
+        et_userid = (EditText) findViewById(R.id.et_imported_email);
+        et_pass = (EditText) findViewById(R.id.et_imported_pass);
+        signInButton = (Button) findViewById(R.id.bt_imported_signin_dummy);
+        emailSignIn = (Button) findViewById(R.id.bt_imported_signin);
+
+        et_userid.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+
+                }else {
+                    if(TextUtils.isEmpty(et_userid.getText()))
+                        et_userid.setError("This field cannot be left blank");
+                }
             }
-        } catch (Settings.SettingNotFoundException e) {
-            e.printStackTrace();
-        }*/
-        //GPS Permission
-        /*
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
+        });
+        et_pass.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
 
-
-        } else {
-
-        }*/
+                }else {
+                    if(TextUtils.isEmpty(et_pass.getText()))
+                        et_pass.setError("This field cannot be left blank");
+                }
+            }
+        });
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -136,49 +141,44 @@ public class SignInActivity extends AppCompatActivity implements
         }
         else{
 
-            OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+            /*OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
             if (opr.isDone()) {
 
                 Log.d(TAG, "Got cached sign-in");
                 GoogleSignInResult result = opr.get();
                 firebaseAuthWithGoogle(result);
                 signIn();
-            }
+            }*/
             signInButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
-                    if (opr.isDone()) {
 
-                        Log.d(TAG, "Got cached sign-in");
-                        GoogleSignInResult result = opr.get();
-                        firebaseAuthWithGoogle(result);
+                    if(TextUtils.isEmpty(et_userid.getText()))
+                        et_userid.setError("This field cannot be left blank");
+                    else if(TextUtils.isEmpty(et_pass.getText()))
+                        et_pass.setError("This field cannot be left blank");
+                    else{
+                        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+                        if (opr.isDone()) {
 
-                    } else {
-                        showProgressDialog();
-                        opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
-                            @Override
-                            public void onResult(GoogleSignInResult googleSignInResult) {
-                                hideProgressDialog();
-                            }
-                        });
+                            Log.d(TAG, "Got cached sign-in");
+                            GoogleSignInResult result = opr.get();
+                            firebaseAuthWithGoogle(result);
+
+                        } else {
+                            showProgressDialog();
+                            opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                                @Override
+                                public void onResult(GoogleSignInResult googleSignInResult) {
+                                    hideProgressDialog();
+                                }
+                            });
+                        }
+                        signIn();
                     }
-                    signIn();
                 }
             });
 
-            bt_logout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    signOut();
-                }
-            });
-            bt_disconnect.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    revokeAccess();
-                }
-            });
         }
     }
 
@@ -244,14 +244,9 @@ public class SignInActivity extends AppCompatActivity implements
             i.putExtra("key2",acct.getEmail());
             i.putExtra("key3",acct.getPhotoUrl().toString());
             mAuth = FirebaseAuth.getInstance();
-            //uid = mAuth.getCurrentUser().getUid();
-            //i.putExtra("uid",uid);
-            //i.putExtra("key4",mGoogleApiClient.toString());
             startActivity(i);
             finish();
-            //updateUI(true);
         } else {
-            // Signed out, show unauthenticated UI.
             Log.d(TAG,"SignIn Failed");
         }
     }
@@ -316,12 +311,6 @@ public class SignInActivity extends AppCompatActivity implements
             case R.id.sign_in_button:
                 signIn();
                 break;
-            case R.id.bt_logout:
-                signOut();
-                break;
-            case R.id.bt_disconnect:
-                revokeAccess();
-                break;
         }
     }
 
@@ -330,7 +319,6 @@ public class SignInActivity extends AppCompatActivity implements
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_INTERNET: {
-                // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
@@ -354,19 +342,6 @@ public class SignInActivity extends AppCompatActivity implements
                                 });
                             }
                             signIn();
-                        }
-                    });
-
-                    bt_logout.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            signOut();
-                        }
-                    });
-                    bt_disconnect.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            revokeAccess();
                         }
                     });
 
@@ -379,56 +354,6 @@ public class SignInActivity extends AppCompatActivity implements
                 }
                 return;
             }
-            /*case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    signInButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
-                            if (opr.isDone()) {
-
-                                Log.d(TAG, "Got cached sign-in");
-                                GoogleSignInResult result = opr.get();
-                                firebaseAuthWithGoogle(result);
-
-                            } else {
-                                showProgressDialog();
-                                opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
-                                    @Override
-                                    public void onResult(GoogleSignInResult googleSignInResult) {
-                                        hideProgressDialog();
-                                    }
-                                });
-                            }
-                            signIn();
-                        }
-                    });
-
-                    bt_logout.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            signOut();
-                        }
-                    });
-                    bt_disconnect.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            revokeAccess();
-                        }
-                    });
-
-
-                } else {
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(SignInActivity.this);
-                    builder.setTitle("Error!").setIcon(android.R.drawable.ic_dialog_alert).setMessage("Please connect to Internet before proceeding.");
-                    builder.show();
-                }
-                return;
-            }*/
         }
     }
 

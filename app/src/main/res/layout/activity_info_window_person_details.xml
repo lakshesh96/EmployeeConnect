@@ -90,7 +90,7 @@
                 android:id="@+id/textView17"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Add"
+                android:text="Address"
                 android:textColor="@android:color/black"
                 android:textSize="20dp"
                 android:layout_weight="22"/>
@@ -216,19 +216,48 @@
             android:layout_marginTop="20dp"
             android:orientation="horizontal">
 
-            <Button
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Call"
-                android:id="@+id/bt_call"
-                android:layout_weight="33"/>
+                android:layout_weight="33"
+                android:orientation="horizontal"
+                android:background="@drawable/custom_border">
 
-            <Button
-                android:layout_width="wrap_content"
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/icon_call"
+                    android:layout_weight="20"/>
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Call"
+                    android:id="@+id/bt_call"
+                    android:background="@color/cardview_light_background"
+                    android:layout_weight="80"/>
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="SMS"
-                android:id="@+id/bt_text"
-                android:layout_weight="33"/>
+                android:layout_weight="33"
+                android:orientation="horizontal"
+                android:background="@drawable/custom_border"
+                android:layout_marginLeft="2dp">
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/icon_sms"
+                    android:layout_weight="20"/>
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="SMS"
+                    android:id="@+id/bt_text"
+                    android:background="@color/cardview_light_background"
+                    android:layout_weight="80"/>
+            </LinearLayout>
 
         </LinearLayout>
 

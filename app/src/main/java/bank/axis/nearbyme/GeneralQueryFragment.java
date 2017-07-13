@@ -246,7 +246,7 @@ public class GeneralQueryFragment extends Fragment implements OnMapReadyCallback
             builder.include(marker.getPosition());
         }
         LatLngBounds bounds = builder.build();
-        int padding = 300; // offset from edges of the map in pixels
+        int padding = 200; // offset from edges of the map in pixels
         if (markerList.size() > 1) {
             CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
             googleMap.animateCamera(cu);
@@ -359,6 +359,7 @@ public class GeneralQueryFragment extends Fragment implements OnMapReadyCallback
     @Override
     public void onConnected(GoogleApiClient googleApiClient) {
         mGoogleApiClient = googleApiClient;
+        syncMap();
     }
 
     private void syncMap() {
