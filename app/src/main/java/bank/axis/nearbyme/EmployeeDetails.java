@@ -238,6 +238,10 @@ public class EmployeeDetails extends AppCompatActivity
             startActivity(i);
             finish();
         }
+        else if(id == R.id.nav_temp){
+            Intent i = new Intent(this,UserEducation3.class);
+            startActivity(i);
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

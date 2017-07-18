@@ -21,17 +21,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
-
         <activity android:name=".SignInActivity" />
         <activity
             android:name=".EmployeeDetails"
@@ -55,14 +53,19 @@
         <activity
             android:name=".InfoWindowPersonDetails"
             android:theme="@style/Theme.NoTitle" />
-        <activity android:name=".UserEducationActivity"
-            android:label="Welcome!"/>
-        <activity android:name=".UserEducationActivity_2"
+        <activity
+            android:name=".UserEducationActivity"
+            android:label="Welcome!" />
+        <activity
+            android:name=".UserEducationActivity_2"
             android:label="Welcome!"
-            android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".SignInEmailActivity"
-            android:label="Sign In to Connect!"></activity>
-
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".SignInEmailActivity"
+            android:label="Sign In to Connect!" />
+        <activity
+            android:name=".UserEducation3"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
