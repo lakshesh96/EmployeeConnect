@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.firebase.database.DatabaseReference;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -80,10 +79,10 @@ public class ProfileActivity extends Fragment implements onDataReceivedInterface
         tv_name_head = (TextView) rootView.findViewById(R.id.tv_name);
         if(photoURL != null) {
             //new ImageLoadTask(photoURL, iv_profile_icon).execute();
-            Picasso.with(getActivity()).load(photoURL).into(iv_profile_icon);
+            //Picasso.with(getActivity()).load(photoURL).into(iv_profile_icon);
         }
         else
-            iv_profile_icon.setImageResource(R.drawable.question_mark);
+            //iv_profile_icon.setImageResource(R.drawable.question_mark);
 
         tv_name_head.setText(name);
 

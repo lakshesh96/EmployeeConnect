@@ -16,17 +16,14 @@
             android:layout_height="260dp"
             android:background="@color/cardview_light_background">
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/axisbanklogo_1" />
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center|bottom"
-                android:background="#80000000"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:background="#A72355">
+                <!--android:background="#80000000"-->
+
 
                 <TextView
                     android:id="@+id/sin"
@@ -37,9 +34,23 @@
                     android:gravity="center"
                     android:padding="16dp"
                     android:text="Sign in"
-                    android:textColor="#999999"
+                    android:textColor="#FFFFFF"
                     android:textSize="16dp" />
             </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/imageView4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/axisbanklogo_1"
+                    android:layout_centerInParent="true"/>
+
+            </RelativeLayout>
+
         </FrameLayout>
 
         <EditText

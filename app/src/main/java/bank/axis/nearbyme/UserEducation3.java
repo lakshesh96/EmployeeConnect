@@ -138,7 +138,7 @@ public class UserEducation3 extends AppCompatActivity {
                 textView.setText("Connect to Fellow Employees");
             }
             else if(screen_number == 3){
-                iv_education_icon.setImageResource(R.drawable.user_education_icon3);
+                iv_education_icon.setImageResource(R.drawable.user_education_icon4);
                 textView.setText("Make your Own Group");
             }
             else if(screen_number == 4){
@@ -146,7 +146,7 @@ public class UserEducation3 extends AppCompatActivity {
                 layout_edu2.setVisibility(View.VISIBLE);
             }
             else if(screen_number == 5){
-                textView.setText("Hop In!");
+                textView.setText("Hop On!");
             }
             else if(screen_number == 6){
                 Intent i = new Intent(getActivity(),SignInEmailActivity.class);

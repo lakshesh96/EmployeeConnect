@@ -36,6 +36,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import bank.axis.nearbyme.Database.DatabaseInstance;
 import bank.axis.nearbyme.Database.UserDetails;
@@ -203,6 +204,8 @@ public class GeneralQueryFragment extends Fragment implements OnMapReadyCallback
 
     public void addLocationDataToMapAfterFetchingFrom(final GoogleMap googleMap) {
         mMap = googleMap;
+        Random r = new Random();
+        int ri = r.nextInt(9+1);
         for (int i = 0; i < userList.size(); i++) {
             String uid = userList.get(i).getId();
             if (uid.equals(userID)) {
@@ -215,7 +218,9 @@ public class GeneralQueryFragment extends Fragment implements OnMapReadyCallback
                 //new MarkerLoad(userList.get(i).getLatitude(),userList.get(i).getLongitude(),userList.get(i).getName(),userList.get(i).getAddress(),userList.get(i).getPhotoURL());
                 Marker marker = createMarker(userList.get(i).getLatitude(), userList.get(i).getLongitude(), userList.get(i).getName(), userList.get(i).getAddress());
                 markerList.add(marker);
-
+                if(i == ri){
+                    marker.showInfoWindow();
+                }
                 /*final int index = i;
                 new Thread(new Runnable() {
                     @Override
