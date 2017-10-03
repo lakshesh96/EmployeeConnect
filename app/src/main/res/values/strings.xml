@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Employee Connect!</string>
+    <string name="app_name">Student Connect!</string>
     <string name="title_activity_employee_details">EmployeeDetails</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>

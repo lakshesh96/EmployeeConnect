@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context="bank.axis.nearbyme.MainActivity"
     android:orientation="vertical"
-    android:background="@drawable/splash_test6">
+    android:background="@drawable/muj_splash2">
 
     <RelativeLayout
         android:layout_width="match_parent"

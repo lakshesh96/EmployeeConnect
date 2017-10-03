@@ -24,11 +24,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/btnformate"
-            android:textColor="#fff"
+            android:textColor="#111"
             android:textSize="12dp"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:text="Lets Connect to Axis Employee Group"
+            android:text="Lets Connect to MUJ Student Group"
             android:padding="10dp"/>
 
     </RelativeLayout>
