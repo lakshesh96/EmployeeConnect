@@ -56,6 +56,7 @@ public class SignInActivity extends AppCompatActivity implements
     private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private final int MY_PERMISSIONS_REQUEST_INTERNET = 2;
     private final int MY_PERMISSIONS_REQUEST_ACCESS_NETWORK_STATE = 3;
+    private final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 4;
     String uid;
     UserInfo userInfo;
 
@@ -68,8 +69,8 @@ public class SignInActivity extends AppCompatActivity implements
 
         et_userid = (EditText) findViewById(R.id.et_imported_email);
         et_pass = (EditText) findViewById(R.id.et_imported_pass);
-        signInButton = (Button) findViewById(R.id.bt_imported_signin_dummy);
-        emailSignIn = (Button) findViewById(R.id.bt_imported_signin);
+        signInButton = (Button) findViewById(R.id.bt_imported_signin);
+        emailSignIn = (Button) findViewById(R.id.bt_imported_signin_dummy);
 
         et_userid.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -113,6 +114,10 @@ public class SignInActivity extends AppCompatActivity implements
         ActivityCompat.requestPermissions(this,
                 new String[]{android.Manifest.permission.ACCESS_NETWORK_STATE},
                 MY_PERMISSIONS_REQUEST_ACCESS_NETWORK_STATE);
+        ActivityCompat.requestPermissions(this,
+                new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
+                MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+
 
         Boolean check = isNetworkAvailable();
         if(check == null){
@@ -153,11 +158,11 @@ public class SignInActivity extends AppCompatActivity implements
                 @Override
                 public void onClick(View v) {
 
-                    if(TextUtils.isEmpty(et_userid.getText()))
+                    /*if(TextUtils.isEmpty(et_userid.getText()))
                         et_userid.setError("This field cannot be left blank");
                     else if(TextUtils.isEmpty(et_pass.getText()))
                         et_pass.setError("This field cannot be left blank");
-                    else{
+                    else{*/
                         OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
                         if (opr.isDone()) {
 
@@ -175,7 +180,7 @@ public class SignInActivity extends AppCompatActivity implements
                             });
                         }
                         signIn();
-                    }
+                    //}
                 }
             });
 

@@ -149,7 +149,8 @@ public class UserEducation3 extends AppCompatActivity {
                 textView.setText("Hop On!");
             }
             else if(screen_number == 6){
-                Intent i = new Intent(getActivity(),SignInEmailActivity.class);
+                //Intent i = new Intent(getActivity(),SignInEmailActivity.class);
+                Intent i = new Intent(getActivity(),SignInActivity.class);
                 startActivity(i);
                 getActivity().finish();
             }

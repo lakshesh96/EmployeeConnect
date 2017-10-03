@@ -129,15 +129,24 @@ public class EmployeeDetails extends AppCompatActivity
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
+
+        //uid = mAuth.getCurrentUser().getUid();
+
+        googleMapGeneralQueryFragmentData = new Bundle();
+        googleMapGeneralQueryFragmentData.putString("UID",uid);
+
         fragmentManager = getSupportFragmentManager();
-
-
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         GeneralQueryFragment generalQueryFragment = new GeneralQueryFragment();
         generalQueryFragment.setArguments(googleMapGeneralQueryFragmentData);
         fragmentTransaction.replace(R.id.fragmentHolder,generalQueryFragment);
         fragmentTransaction.commit();
 
+        googleMapData = new Bundle();
+        googleMapData.putString("UID",uid);
+        googleMapData.putString("NAME",name);
+        googleMapData.putString("EMAIL",email);
+        googleMapData.putString("PHOTOURL",photourl);
 
         /*FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         GoogleMapFragment googleMapFragment = new GoogleMapFragment();

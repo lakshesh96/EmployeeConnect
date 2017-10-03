@@ -266,24 +266,6 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback,/*
         getDeviceLocation();
     }
 
-
-/*
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        mapFragment.getMapAsync(this);
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
-*/
-
     @Override
     public void onPause() {
         super.onPause();
@@ -328,10 +310,18 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback,/*
             addresses = geocoder.getFromLocation(temp_coordinates.latitude,temp_coordinates.longitude,1);
             userinfo.setAddress(addresses.get(0).getAddressLine(0));
             userinfo.setPincode(addresses.get(0).getPostalCode());
-            userinfo.setLocality(addresses.get(0).getLocality());
+            //userinfo.setLocality(addresses.get(0).getLocality());
+            userinfo.setLocality(addresses.get(0).getSubAdminArea());
 
+            String locality = null;
+            String state = addresses.get(0).getAdminArea();
+            String city = addresses.get(0).getSubAdminArea();
+            if(addresses.get(0).getLocality().equals("Dahmi Kalan") || addresses.get(0).getLocality().equals("Dehmi Kalan")){
+                locality = "Jaipur";
+            }
             SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString("locality",addresses.get(0).getLocality());
+            //editor.putString("locality",addresses.get(0).getLocality());
+            editor.putString("locality",city);
             editor.commit();
 
         } catch (Exception e) {
@@ -341,7 +331,7 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback,/*
 
 
         Intent i = new Intent(getActivity(),UploadDetailsForm.class);
-//        i.putExtra("name",userinfo.getName());
+        //i.putExtra("name",userinfo.getName());
         Bundle b = new Bundle();
         b.putSerializable("userinfo", userinfo);
         i.putExtras(b);
@@ -403,7 +393,7 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback,/*
         try{
             addresses = geocoder.getFromLocation(cord.latitude,cord.longitude,1);
             SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString("locality",addresses.get(0).getLocality());
+            editor.putString("locality",addresses.get(0).getSubAdminArea());
             editor.commit();
 
         }catch(Exception e){
