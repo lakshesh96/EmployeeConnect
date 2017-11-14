@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -36,13 +38,15 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import bank.axis.nearbyme.Database.DatabaseInstance;
 import bank.axis.nearbyme.Database.UserDetails;
 import bank.axis.nearbyme.Database.UserInfo;
 import bank.axis.nearbyme.Database.onDataReceivedInterface;
 
-public class GeneralQueryFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleClientCallBack,onDataReceivedInterface {
+public class GeneralQueryFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleClientCallBack, onDataReceivedInterface {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -83,6 +87,9 @@ public class GeneralQueryFragment extends Fragment implements OnMapReadyCallback
     private onDataReceivedInterface onDataReceivedInterfaceListener;
     private OnFragmentInteractionListener mListener;
     private String MY_PREFS_NAME = "MyLocationData";
+    Geocoder geocoder;
+    List<Address> addresses;
+    private SharedPreferences sharedPref;
 
     public GeneralQueryFragment() {
     }
@@ -114,12 +121,15 @@ public class GeneralQueryFragment extends Fragment implements OnMapReadyCallback
 
         if (GoogleClient.getGoogleApiClient() == null) {
             new GoogleClient(getActivity(), googleClientCallback);
+            //mGoogleApiClient = GoogleClient.getGoogleApiClient();
         } else {
             mGoogleApiClient = GoogleClient.getGoogleApiClient();
         }
         mDatabase = DatabaseInstance.getFirebaseInstance().getReference("Cluster");
-        SharedPreferences sharedPref = getActivity().getSharedPreferences(MY_PREFS_NAME,Context.MODE_PRIVATE);
+        mAuth = FirebaseAuth.getInstance();
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
         locality = sharedPref.getString("locality", "not found");
+
     }
 
     @Override
@@ -195,16 +205,21 @@ public class GeneralQueryFragment extends Fragment implements OnMapReadyCallback
                 }
             });*/
             DatabaseInstance databaseInstance = new DatabaseInstance();
-            if(onDataReceivedInterfaceListener != null && locality != null)
+            if (onDataReceivedInterfaceListener != null && locality != null)
                 DatabaseInstance.setListener(this);
-                databaseInstance.getAllUsers(locality);
+            databaseInstance.getAllUsers(locality);
         }
+        /*else
+            getDeviceLocation();*/
     }
 
     public void addLocationDataToMapAfterFetchingFrom(final GoogleMap googleMap) {
         mMap = googleMap;
+        Random r = new Random();
+        int ri = r.nextInt(9 + 1);
         for (int i = 0; i < userList.size(); i++) {
             String uid = userList.get(i).getId();
+            userID = mAuth.getCurrentUser().getUid();
             if (uid.equals(userID)) {
                 LatLng location = new LatLng(userList.get(i).getLatitude(), userList.get(i).getLongitude());
                 Marker marker = mMap.addMarker(new MarkerOptions().position(location).title(userList.get(i).getName()).snippet(userList.get(i).getAddress()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
@@ -215,7 +230,9 @@ public class GeneralQueryFragment extends Fragment implements OnMapReadyCallback
                 //new MarkerLoad(userList.get(i).getLatitude(),userList.get(i).getLongitude(),userList.get(i).getName(),userList.get(i).getAddress(),userList.get(i).getPhotoURL());
                 Marker marker = createMarker(userList.get(i).getLatitude(), userList.get(i).getLongitude(), userList.get(i).getName(), userList.get(i).getAddress());
                 markerList.add(marker);
-
+                if (i == ri) {
+                    marker.showInfoWindow();
+                }
                 /*final int index = i;
                 new Thread(new Runnable() {
                     @Override
@@ -246,7 +263,7 @@ public class GeneralQueryFragment extends Fragment implements OnMapReadyCallback
             builder.include(marker.getPosition());
         }
         LatLngBounds bounds = builder.build();
-        int padding = 300; // offset from edges of the map in pixels
+        int padding = 200; // offset from edges of the map in pixels
         if (markerList.size() > 1) {
             CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
             googleMap.animateCamera(cu);
@@ -326,7 +343,7 @@ public class GeneralQueryFragment extends Fragment implements OnMapReadyCallback
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
-        if(mLocationPermissionGranted){
+        if (mLocationPermissionGranted) {
             mLastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         }
         if (mCameraPosition != null) {
@@ -340,8 +357,9 @@ public class GeneralQueryFragment extends Fragment implements OnMapReadyCallback
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
         }
-        cord = new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
+        cord = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
         mMap.setMyLocationEnabled(true);
+
         //userinfo.setCoordinates(cord);
         /*mMap.addMarker(new MarkerOptions()
                 .title(getString(R.string.title_activity_maps))
@@ -349,9 +367,20 @@ public class GeneralQueryFragment extends Fragment implements OnMapReadyCallback
                 .snippet("Current Location"))
                 .setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));*/
         //mMap.clear();
-        if(myLocationMarker == null){
+        if (myLocationMarker == null) {
             markStartingLocationOnMap(mMap, cord);
         }
+        /*geocoder = new Geocoder(getActivity(), Locale.getDefault());
+        try {
+            addresses = geocoder.getFromLocation(cord.latitude, cord.longitude, 1);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("locality", addresses.get(0).getSubAdminArea());
+            editor.commit();
+            fetchDataFromFirebase();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }*/
 
 
     }
@@ -359,6 +388,7 @@ public class GeneralQueryFragment extends Fragment implements OnMapReadyCallback
     @Override
     public void onConnected(GoogleApiClient googleApiClient) {
         mGoogleApiClient = googleApiClient;
+        syncMap();
     }
 
     private void syncMap() {
@@ -385,28 +415,30 @@ public class GeneralQueryFragment extends Fragment implements OnMapReadyCallback
         void onFragmentInteraction(Uri uri);
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         Bundle bundle = getActivity().getIntent().getParcelableExtra("bundle");
         mReceivedLocation = bundle.getParcelable("coordinates");
         Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
     }
+
     protected Marker createMarker(double latitude, double longitude, String title, String snippet) {
 
         //title = title + "_" + bmp.toString();
         //title = title + "_" + photoURL;
         return mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(latitude, longitude))
-                .anchor(0.5f, 0.5f)
-                .title(title)
-                .snippet(snippet)
+                        .position(new LatLng(latitude, longitude))
+                        .anchor(0.5f, 0.5f)
+                        .title(title)
+                        .snippet(snippet)
                 /*.icon(BitmapDescriptorFactory.fromBitmap(bmp))*/);
     }
 
     //Custom Info Window
-    class MyInfoWindowAdapter implements GoogleMap.InfoWindowAdapter{
+    class MyInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         private View myContentsView;
-        MyInfoWindowAdapter(){
+
+        MyInfoWindowAdapter() {
             myContentsView = getActivity().getLayoutInflater().inflate(R.layout.custom_info_content, null);
         }
 
@@ -432,12 +464,13 @@ public class GeneralQueryFragment extends Fragment implements OnMapReadyCallback
 
             return myContentsView;
         }
-        public Bitmap StringToBitMap(String encodedString){
+
+        public Bitmap StringToBitMap(String encodedString) {
             try {
-                byte [] encodeByte=Base64.decode(encodedString, Base64.DEFAULT);
-                Bitmap bitmap=BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+                byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
                 return bitmap;
-            } catch(Exception e) {
+            } catch (Exception e) {
                 e.getMessage();
                 return null;
             }

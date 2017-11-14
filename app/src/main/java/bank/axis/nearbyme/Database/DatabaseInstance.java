@@ -68,7 +68,7 @@ public class DatabaseInstance {
     public void getUserDetails(String locality) {
         mDatabase = DatabaseInstance.getFirebaseInstance().getReference("UserDetails");
         final UserDetails[] userDetail = {new UserDetails()};
-        mDatabase.child(locality).child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString()).addValueEventListener(new ValueEventListener() {
+        mDatabase.child(locality).child(FirebaseAuth.getInstance().getCurrentUser().getUid()/*"LGE8dJYZQbhKczIaST1wgmPrCZC3"*/).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 UserDetails details = dataSnapshot.getValue(UserDetails.class);

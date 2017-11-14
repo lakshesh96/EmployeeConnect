@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Near By Me</string>
+    <string name="app_name">Student Connect!</string>
     <string name="title_activity_employee_details">EmployeeDetails</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -10,4 +10,6 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_user_education3">UserEducation3</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 </resources>

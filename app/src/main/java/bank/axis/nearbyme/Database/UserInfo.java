@@ -17,7 +17,7 @@ public class UserInfo implements Serializable{
     private double longitude;
     private String pincode;
     private String locality;
-    private  String photoURL;
+    private String photoURL;
 
     public UserInfo(){}
 

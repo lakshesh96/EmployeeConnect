@@ -18,6 +18,7 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="Theme.Default" parent="@android:style/Theme"></style>
+
     <style name="Theme.FullScreen" parent="@android:style/Theme.NoTitleBar.Fullscreen"></style>
 
     <style name="Theme.NoTitle" parent="@style/Theme.AppCompat.Light.Dialog">

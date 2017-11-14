@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ public class UploadDetailsForm extends AppCompatActivity implements AdapterView.
     UserInfo userinfo;
     UserDetails userdetails;
     private DatabaseReference mDatabase;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,7 @@ public class UploadDetailsForm extends AppCompatActivity implements AdapterView.
 
         userdetails = new UserDetails();
         mDatabase = DatabaseInstance.getFirebaseInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();
 
         tv_name = (TextView) findViewById(R.id.tv_Name);
         tv_email = (TextView) findViewById(R.id.tv_email);
@@ -83,7 +86,9 @@ public class UploadDetailsForm extends AppCompatActivity implements AdapterView.
                 if (!isValidMobile(et_phone.getText().toString())) {
                     et_phone.setError("Enter Valid Mobile Number");
                 } else {
-                      mDatabase.child("Cluster").child(userinfo.getLocality()).child(userinfo.getId()).setValue(userinfo).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    String uid2 = mAuth.getCurrentUser().getUid();
+                    userinfo.setId(uid2);
+                      mDatabase.child("Cluster").child(userinfo.getLocality()).child(/*userinfo.getId()*/uid2).setValue(userinfo).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                         }
@@ -112,7 +117,7 @@ public class UploadDetailsForm extends AppCompatActivity implements AdapterView.
                     else
                         userdetails.setDept("Unknown");
 
-                    mDatabase.child("UserDetails").child(userinfo.getLocality()).child(userinfo.getId()).setValue(userdetails).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    mDatabase.child("UserDetails").child(userinfo.getLocality()).child(/*userinfo.getId()*/uid2).setValue(userdetails).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             Toast.makeText(UploadDetailsForm.this, "Details added Successfully", Toast.LENGTH_SHORT).show();
